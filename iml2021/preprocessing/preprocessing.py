@@ -1,18 +1,18 @@
 import os
 import numpy as np
 
+from matplotlib import pyplot as plt
 
-def computeSizeOfDifferentSubjects(subjectNumber):
+def computeProportionSubjectMeasures():
     LS = np.loadtxt(os.path.join('../data/LS', 'subject_Id.txt'))
-    TS = np.loadtxt(os.path.join('../data/TS', 'subject_Id.txt'))
+    activity = np.loadtxt(os.path.join('../data/LS', 'activity_Id.txt'))
 
+    uniqueActivity, countActivity = np.unique(activity, return_counts = True)
     uniqueLS, countLS = np.unique(LS, return_counts = True)
-    uniqueTS, countTS = np.unique(TS, return_counts = True)
-
-    print('LS : {}.'.format(np.asarray((uniqueLS, countLS))))
-    print('TS : {}.'.format(np.asarray((uniqueTS, countTS))))
-
+    
+    print('activity : {}.'.format(np.asarray((uniqueActivity, countActivity))))
+    print('LS subject_id : {}.'.format(np.asarray((uniqueLS, countLS))))
+    
 if __name__ == '__main__':
-    subjectNumber = 3500
-    computeSizeOfDifferentSubjects(subjectNumber)
+    computeProportionSubjectMeasures()
 

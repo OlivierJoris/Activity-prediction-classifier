@@ -1,0 +1,11 @@
+There are 512 * 3500 measures which can be summarize without losing a lot of information
+and each , features selection is good
+for that :
+
+Variance threshold : https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.VarianceThreshold.html
+Goal : Eliminates low-variance features
+
+Recursive feature elimination : https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFECV.html
+Goal : Recursively remove feature with cross-validation 
+
+

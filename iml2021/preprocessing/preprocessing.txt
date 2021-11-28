@@ -1,0 +1,17 @@
+1. The dataset is imbalanced (e.g. 350 measures concerning subject with id 1 
+and 919 for id 5) : 
+
+(a) Random oversampling and undersampling :https://machinelearningmastery.com/random-oversampling-and-undersampling-for-imbalanced-classification/
+(b) SMOTE : https://machinelearningmastery.com/smote-oversampling-for-imbalanced-classification/
+(c) ADASYN : https://towardsdatascience.com/adasyn-adaptive-synthetic-sampling-method-for-imbalanced-data-602a3673ba16
+
+2. There are 512 * 3500 measures which can be summarize without losing a lot of 
+information using features selection :
+
+(a) Variance threshold : https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.VarianceThreshold.html
+Goal : Eliminates low-variance features
+
+(b) Recursive feature elimination : https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.RFECV.html
+Goal : Recursively remove feature with cross-validation 
+
+

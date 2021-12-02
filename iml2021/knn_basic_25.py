@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# Based on Antonio Sutera & Yann Claes
+# Based on Antonio Sutera & Yann Claes (toy_script.py)
 
 import os
 import numpy as np

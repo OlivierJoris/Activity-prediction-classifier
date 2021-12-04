@@ -1,13 +1,19 @@
+# %%
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# Author: Antonio Sutera & Yann Claes
 
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.impute import SimpleImputer
+from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.feature_selection import SelectFromModel
+from sklearn.impute import KNNImputer
+from sklearn.model_selection import cross_val_score
 
+# %%
+# Author: Antonio Sutera & Yann Claess
 def load_data(data_path):
 
     FEATURES = range(2, 33)
@@ -63,31 +69,50 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
 
     print('Submission {} saved in {}.'.format(submission_name, SUBMISSION_PATH))
 
-def preprocess_data(X_train):
-    new_X_train = [[]] * 3500
+# %%
+def compute_proportion_subjects():
+    LS = np.loadtxt(os.path.join('data/LS', 'subject_Id.txt'))
+    activity = np.loadtxt(os.path.join('data/LS', 'activity_Id.txt'))
 
-    for i in range(3500):
-        for f in range(2, 33):
-            if np.var(X_train[i][(f-2)*512:(f-2+1)*512]) != 0:
-                new_X_train[i].append(X_train[i][(f-2)*512:(f-2+1)*512])
+    unique_activity, count_activity = np.unique(activity, return_counts = True)
+    unique_ls, count_ls = np.unique(LS, return_counts = True)
     
-    return new_X_train
+    plt.bar(unique_activity, count_activity, width=0.5, bottom=None, align='center', data=None)
+    plt.title("Repartion of the activties in the learning set")
+    plt.xlabel("activity id")
+    plt.ylabel("number of instances")
+    plt.show()
+    
+    plt.bar(unique_ls, count_ls, width=0.5, bottom=None, align='center', data=None)
+    plt.title("Repartion of the subject id in the learning set")
+    plt.xlabel("subject id")
+    plt.ylabel("number of instances")
+    plt.show()
 
+# %%
 if __name__ == '__main__':
+    # Compute proportion of subjects
+    compute_proportion_subjects()
 
+# %%
     # Directory containing the data folders
     DATA_PATH = 'data'
     X_train, y_train, X_test = load_data(DATA_PATH)
 
-    imp = SimpleImputer(missing_values=-999999.99, strategy='mean')
-    imp.fit(X_train)
-    X_train = imp.transform(X_train)
+# %%
+    # Replace missing values
+    imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
+    X_train = imputer.fit_transform(X_train)
 
-    print(X_train.shape)
+# %%
+    # Features selection
+    etc = ExtraTreesClassifier(n_estimators = 1000)
+    
+    print("Shape before feature selection: " + str(X_train.shape))
+    
+    selector = SelectFromModel(estimator = etc).fit(X_train, y_train)
+    X_train = selector.transform(X_train)
+    X_test = selector.transform(X_test)
+    
+    print("Shape after feature selection: " + str(X_train.shape))
 
-    clf = KNeighborsClassifier(n_neighbors=25)
-    clf.fit(X_train, y_train)
-
-    y_test = clf.predict(X_test)
-
-    write_submission(y_test, 'submissions')

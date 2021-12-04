@@ -78,13 +78,13 @@ def compute_proportion_subjects():
     unique_ls, count_ls = np.unique(LS, return_counts = True)
     
     plt.bar(unique_activity, count_activity, width=0.5, bottom=None, align='center', data=None)
-    plt.title("Repartion of the activties in the learning set")
+    plt.title("Repartition of the activties in the learning set")
     plt.xlabel("activity id")
     plt.ylabel("number of instances")
     plt.show()
     
     plt.bar(unique_ls, count_ls, width=0.5, bottom=None, align='center', data=None)
-    plt.title("Repartion of the subject id in the learning set")
+    plt.title("Repartition of the subject id in the learning set")
     plt.xlabel("subject id")
     plt.ylabel("number of instances")
     plt.show()

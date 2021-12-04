@@ -16,7 +16,7 @@ class DecisionTree:
         """
         Argument:
         ---------
-        - `n_neighbors`: number of neighbors used in the KNN models.
+        - `min_sample_split`: min_sample_split for the trees in the forest.
         """
         self.min_sample_split = min_sample_split
     

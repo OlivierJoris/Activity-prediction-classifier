@@ -7,18 +7,20 @@ import numpy as np
 from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
 
-class DecisionTree:
+class DecisionTreePruned:
     """
-    Classifier that uses a decision tree.
+    Classifier that uses a pruneed decision tree.
     """
 
-    def __init__(self, min_sample_split):
+    def __init__(self, min_sample_split, ccp_alpha):
         """
         Argument:
         ---------
         - `min_sample_split`: min_sample_split for the trees in the forest.
+        - `ccp_alpha`: value for prunning.
         """
         self.min_sample_split = min_sample_split
+        self.ccp_alpha = ccp_alpha
     
     def load_data(self, data_path):
         """
@@ -55,10 +57,8 @@ class DecisionTree:
         Fit the classifier.
         """
 
-        self.model = DecisionTreeClassifier(min_samples_leaf=self.min_sample_split)
+        self.model = DecisionTreeClassifier(min_samples_leaf=self.min_sample_split, ccp_alpha=self.ccp_alpha)
         self.model = self.model.fit(self.X_train, self.y_train)
-
-        tree.plot_tree(self.model)
 
     def predict(self):
         """
@@ -106,11 +106,11 @@ if __name__ == '__main__':
     # Directory containing the data folders
     DATA_PATH = 'data'
 
-    clf = DecisionTree(min_sample_split=1)
+    clf = DecisionTreePruned(min_sample_split=2, ccp_alpha=0.0006772486772486773)
     clf.load_data(DATA_PATH)
     clf.fit()
 
     predictions = np.zeros(3500, dtype=int)
     predictions = clf.predict()
 
-    write_submission(predictions, 'submissions', submission_name='dt_basic_1.csv')
+    write_submission(predictions, 'submissions', submission_name='dt_pruned.csv')

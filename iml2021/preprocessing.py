@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
 # %%
     # Features selection
-    etc = ExtraTreesClassifier(n_estimators = 1000)
+    etc = ExtraTreesClassifier(n_estimators = 1000, random_state = 0)
     
     print("Shape before feature selection: " + str(X_train.shape))
     

@@ -27,8 +27,6 @@ class RandomForest:
         Modified from the method given with the assignment.
         """
 
-        print("Loading data...")
-
         FEATURES = range(2, 33)
         N_TIME_SERIES = 3500
 
@@ -58,17 +56,17 @@ class RandomForest:
         Fit the classifier.
         """
 
-        print("Fitting...")
-
         self.model = RandomForestClassifier(n_estimators=self.n_estimators, min_samples_split=self.min_sample_split, n_jobs=-1)
         self.model = self.model.fit(self.X_train, self.y_train)
 
     def predict(self):
         """
         Predict the class labels.
-        """
 
-        print("Predicting...")
+        Return:
+        -------
+        Return the predictions as a numpy ndarray.
+        """
 
         predictions = np.zeros(3500, dtype=int)
         predictions = self.model.predict(self.X_test)
@@ -77,6 +75,9 @@ class RandomForest:
 
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
+    """
+    Method given with the assignment.
+    """
 
     os.makedirs(where, exist_ok=True)
 
@@ -117,7 +118,5 @@ if __name__ == '__main__':
 
     predictions = np.zeros(3500, dtype=int)
     predictions = forest.predict()
-
-    print("Writing submission...")
 
     write_submission(predictions, 'submissions', submission_name='forest_40trees_25mss.csv')

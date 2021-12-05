@@ -15,7 +15,7 @@ class DecisionTreePruned:
         """
         Argument:
         ---------
-        - `min_sample_split`: min_sample_split for the trees in the forest.
+        - `min_sample_split`: min_sample_split for the tree.
         - `ccp_alpha`: value for prunning.
         """
         self.min_sample_split = min_sample_split
@@ -62,6 +62,10 @@ class DecisionTreePruned:
     def predict(self):
         """
         Predict the class labels.
+
+        Return:
+        -------
+        Return the predictions as a numpy ndarray.
         """
 
         predictions = np.zeros(3500, dtype=int)
@@ -71,6 +75,9 @@ class DecisionTreePruned:
 
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
+    """
+    Method given with the assignment.
+    """
 
     os.makedirs(where, exist_ok=True)
 

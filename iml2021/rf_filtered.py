@@ -50,15 +50,15 @@ class RandomForestFiltered:
         print('X_test size: {}.'.format(X_test.shape))
 
         # Replace missing values
-        print("Missing values...")
+        print("Replace missing values...")
         imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
         X_train = imputer.fit_transform(X_train)
 
         # Features selection
-        print("ExtraTreesClassifier...")
+        print("Features selection...")
         etc = ExtraTreesClassifier(n_estimators = 1000)
         
-        print("Shape before feature selection: " + str(X_train.shape))
+        print("X_train shape before feature selection: " + str(X_train.shape))
         
         print("SelectFromModel...")
         selector = SelectFromModel(estimator = etc).fit(X_train, y_train)
@@ -87,6 +87,10 @@ class RandomForestFiltered:
     def predict(self):
         """
         Predict the class labels.
+
+        Return:
+        -------
+        Return the predictions as a numpy ndarray.
         """
 
         print("Predicting...")
@@ -98,6 +102,9 @@ class RandomForestFiltered:
 
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
+    """
+    Method given with the assignment.
+    """
 
     os.makedirs(where, exist_ok=True)
 

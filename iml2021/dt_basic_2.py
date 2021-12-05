@@ -4,7 +4,6 @@
 
 import os
 import numpy as np
-from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
 
 class DecisionTree:
@@ -16,7 +15,7 @@ class DecisionTree:
         """
         Argument:
         ---------
-        - `min_sample_split`: min_sample_split for the trees in the forest.
+        - `min_sample_split`: min_sample_split for the tree.
         """
         self.min_sample_split = min_sample_split
     
@@ -61,6 +60,10 @@ class DecisionTree:
     def predict(self):
         """
         Predict the class labels.
+
+        Return:
+        -------
+        Return the predictions as a numpy ndarray.
         """
 
         predictions = np.zeros(3500, dtype=int)
@@ -70,7 +73,9 @@ class DecisionTree:
 
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
-
+    """
+    Method given with the assignment.
+    """
     os.makedirs(where, exist_ok=True)
 
     SUBMISSION_PATH = os.path.join(where, submission_name)

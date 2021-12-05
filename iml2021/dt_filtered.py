@@ -18,11 +18,15 @@ class DTFiltered:
         """
         Argument:
         ---------
-        - `n_neighbors`: number of neighbors used in the KNN models.
+        - `min_sample_split`: min_sample_split for the tree.
         """
         self.min_sample_split = min_sample_split
     
     def load_data(self, data_path):
+        """
+        Load the data for the classifer.
+        Modified from the method given with the assignment.
+        """
 
         FEATURES = range(2, 33)
         N_TIME_SERIES = 3500
@@ -48,15 +52,15 @@ class DTFiltered:
         print('X_test size: {}.'.format(X_test.shape))
 
         # Replace missing values
-        print("Missing values...")
+        print("Replace missing values...")
         imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
         X_train = imputer.fit_transform(X_train)
 
         # Features selection
-        print("ExtraTreesClassifier...")
+        print("Features selection...")
         etc = ExtraTreesClassifier(n_estimators = 1000)
         
-        print("Shape before feature selection: " + str(X_train.shape))
+        print("X_train shape before feature selection: " + str(X_train.shape))
         
         print("SelectFromModel...")
         selector = SelectFromModel(estimator = etc).fit(X_train, y_train)
@@ -83,6 +87,10 @@ class DTFiltered:
     def predict(self):
         """
         Predict the class labels.
+
+        Return:
+        -------
+        Return the predictions as a numpy ndarray.
         """
 
         predictions = np.zeros(3500, dtype=int)
@@ -92,6 +100,9 @@ class DTFiltered:
 
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
+    """
+    Method given with the assignment.
+    """
 
     os.makedirs(where, exist_ok=True)
 

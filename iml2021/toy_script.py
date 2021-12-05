@@ -63,27 +63,11 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
 
     print('Submission {} saved in {}.'.format(submission_name, SUBMISSION_PATH))
 
-def preprocess_data(X_train):
-    new_X_train = [[]] * 3500
-
-    for i in range(3500):
-        for f in range(2, 33):
-            if np.var(X_train[i][(f-2)*512:(f-2+1)*512]) != 0:
-                new_X_train[i].append(X_train[i][(f-2)*512:(f-2+1)*512])
-    
-    return new_X_train
-
 if __name__ == '__main__':
 
     # Directory containing the data folders
     DATA_PATH = 'data'
     X_train, y_train, X_test = load_data(DATA_PATH)
-
-    imp = SimpleImputer(missing_values=-999999.99, strategy='mean')
-    imp.fit(X_train)
-    X_train = imp.transform(X_train)
-
-    print(X_train.shape)
 
     clf = KNeighborsClassifier(n_neighbors=25)
     clf.fit(X_train, y_train)

@@ -262,4 +262,32 @@ Random forest - filtered data                    & 0.48285                      
 \caption{Approaches with respective Kaggle scores}
 \end{table}
 
+
+\subsection{Support vector machines}
+\paragraph{}For completeness, we wanted to try support vector machines.
+
+\subsubsection{Support vector classification}
+\paragraph{}This approach is based on the model SVC of scikit-learn\footnote{sklearn.svm.SVC.}. We decided to do study the accuracy of this model by splitting the learning set based on the ids of the 5 subjects and by using feature selection.\\
+For our first study, we decided to consider a wide range for the value of the regularization parameter\footnote{Denoted C in scikit learn.}. We choose the range [1.0, 1000.0] has a starting point and obtained the following graph of accuracies depending on the value of the parameter:
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{svm/svm_svc_accuracies_1.png}
+\caption{Accuracy of SVC depending on regularization parameter}
+\end{figure}
+As we can see on the previous plot, it seems there is not an obvious relation between the regularization and the accuracy of the model. Thus, we decided to study the accuracy of the model for values of the regularization in the range [1.0, 100.0]. We obtained the following graph:\newpage
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{svm/svm_svc_accuracies_2.png}
+\caption{Accuracy of SVC depending on regularization parameter}
+\end{figure}
+Once again, it seems there is no obvious relation between the regularization and the accuracy. Yet, the values for the previous graphs were obtained as averages on 10 tries. We decided to increase the number of tries. We obtained the following graph:
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{svm/svm_svc_accuracies_4.png}
+\caption{Accuracy of SVC depending on regularization parameter}
+\end{figure}
+The peak observed on the graph is for a value of the regularization parameter of 60. Thus, we decided to use a SVM (specifically sklearn.svm.SVC) with a value of 60 as the regularization parameter. This models has an accuracy 0.5956468368018641 locally obtained by splitting the learning set based on the ids of the 5 subjects and by using feature selection\footnote{The accuracies are averages over 20 tries.}. \textcolor{red}{Add Kaggle score if any}.\\
+The study performed for this model is available in the Jupyter notebook \texttt{svc-feature-extract\\ion.ipynb} and the implementation of the model in the file \texttt{svc-reg-60.py}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}

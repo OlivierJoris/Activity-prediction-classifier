@@ -240,29 +240,6 @@ This model is implemented in the file \texttt{rf\_filtered.py}. This particular 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Summary table}
-\paragraph{}The following table summaries the techniques we have tried and the scores we have obtained on Kaggle.
-\begin{table}[H]
-\centering
-\begin{tabular}{|l|l|}
-\hline
-\multicolumn{1}{|c|}{\textbf{Approach}}          & \multicolumn{1}{c|}{\textbf{Kaggle score}} \\ \hline
-1-NN                                             & 0.52                                       \\ \hline
-25-NN                                            & 0.54                                       \\ \hline
-55-NN                                            & 0.53142                                    \\ \hline
-49-NN                                            & 0.52571                                    \\ \hline
-Multiple 1-NN                                    & 0.52                                       \\ \hline
-Multiple 1-NN with filtered data                 & 0.53142                                    \\ \hline
-Decision tree - min\_sample\_split=2                        & 0.38571                                    \\ \hline
-Decision tree with pruning                                  & 0.40285                                    \\ \hline
-Decision tree with filtered data                            & 0.43428                                    \\ \hline
-Random forest - 40 trees - min\_sample\_split=25 & 0.52                                       \\ \hline
-Random forest - filtered data                    & 0.48285                                    \\ \hline
-\end{tabular}
-\caption{Approaches with respective Kaggle scores}
-\end{table}
-
-
 \subsection{Support vector machines}
 \paragraph{}For completeness, we wanted to try support vector machines.
 
@@ -288,6 +265,30 @@ Once again, it seems there is no obvious relation between the regularization and
 \end{figure}
 The peak observed on the graph is for a value of the regularization parameter of 60. Thus, we decided to use a SVM (specifically sklearn.svm.SVC) with a value of 60 as the regularization parameter. This models has an accuracy 0.5956468368018641 locally obtained by splitting the learning set based on the ids of the 5 subjects and by using feature selection\footnote{The accuracies are averages over 20 tries.}. \textcolor{red}{Add Kaggle score if any}.\\
 The study performed for this model is available in the Jupyter notebook \texttt{svc-feature-extract\\ion.ipynb} and the implementation of the model in the file \texttt{svc-reg-60.py}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Summary table}
+\paragraph{}The following table summaries the techniques we have tried and the scores we have obtained on Kaggle.
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{Approach}}          & \multicolumn{1}{c|}{\textbf{Kaggle score}} \\ \hline
+1-NN                                             & 0.52                                       \\ \hline
+25-NN                                            & 0.54                                       \\ \hline
+55-NN                                            & 0.53142                                    \\ \hline
+49-NN                                            & 0.52571                                    \\ \hline
+Multiple 1-NN                                    & 0.52                                       \\ \hline
+Multiple 1-NN with filtered data                 & 0.53142                                    \\ \hline
+Decision tree - min\_sample\_split=2                        & 0.38571                                    \\ \hline
+Decision tree with pruning                                  & 0.40285                                    \\ \hline
+Decision tree with filtered data                            & 0.43428                                    \\ \hline
+Random forest - 40 trees - min\_sample\_split=25 & 0.52                                       \\ \hline
+Random forest - filtered data                    & 0.48285                                    \\ \hline
+\end{tabular}
+\caption{Approaches with respective Kaggle scores}
+\end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}

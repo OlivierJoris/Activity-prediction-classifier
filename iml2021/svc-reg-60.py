@@ -81,7 +81,7 @@ def feature_extraction(X_train, X_test, data_path):
     ----------
     - `X_train`: Inputs of LS.
     - `X_test`: Inputs of TS.
-    - `data_path`: Path to the data.
+    - `data_path`: Path to the data folder.
     
     Return:
     -------

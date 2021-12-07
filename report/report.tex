@@ -102,15 +102,15 @@ The implementation of this part can be found in the \texttt{preprocessing.ipynb}
 \subsection{K-nearest neighbors}
 \paragraph{}First, we decided to use the K-nearest neighbors method because it was the one provided by the pedagogical team with the assignment. Yet, the reasons that made us trying multiple versions of this technique are the facts that it is easy to interpret and to use.
 
-\subsubsection{1-NN} \label{subsec:1NN}
+\subsubsection{1-NN} \label{subsubsec:1NN}
 \paragraph{}Our first submission was the one provided with assignment\footnote{File \texttt{example\_submission.csv}.} that was generated with the 1-nearest neighbor model\footnote{Files \texttt{toy\_script.py} or \texttt{knn\_basic\_1.py}.}.\\
 This submission yields a score of 0.52 on Kaggle.
 
-\subsubsection{25-NN}
-\paragraph{}Based on \ref{subsec:1NN}, we decided to increase the value of K of the K-nearest neighbors method to 25. The motivation behind the choice of this value for K was theoretical. Since the dataset is huge and can contain errors in the measured values, we though that increasing the value of K would increase the precision of the model because each prediction will not depend on a single neighbor that could have been misclassified.\\
+\subsubsection{25-NN} \label{subsubsec:25NN}
+\paragraph{}Based on \ref{subsubsec:1NN}, we decided to increase the value of K of the K-nearest neighbors method to 25. The motivation behind the choice of this value for K was theoretical. Since the dataset is huge and can contain errors in the measured values, we though that increasing the value of K would increase the precision of the model because each prediction will not depend on a single neighbor that could have been misclassified.\\
 This technique is implemented in the file \texttt{knn\_basic\_25.py}. This submission yields a score of 0.54 on Kaggle.
 
-\subsubsection{55-NN and 49-NN}
+\subsubsection{55-NN and 49-NN} \label{subsubsec:55-49-NN}
 \paragraph{}We decided to keep using the K-NN method to study how well it could perform on the assignment. We decided to study the accuracy of the KNN technique by using a 10-fold cross validation technique with the negative log loss function as a scoring measure. We obtained the following graph of accuracies depending on the value of K:
 \begin{figure}[H]
 \center
@@ -130,12 +130,12 @@ This submission yields a score of 0.53142 on Kaggle and the implementation of it
 This submission yields a score of 0.52571 on Kaggle which is less than the one for 55-NN. Yet, we expected a higher score based on the graph of figure \ref{fig:knn_log_loss_focused}. The implementation is available inside the file \texttt{knn\_basic\_49.py}.
 \paragraph{}Based on the two previous results, we came to the conclusion that using "vanilla" K-nearest neighbors was not sufficient. Thus, we decided to find new techniques explained in the following sections.
 
-\subsubsection{Multiple K-nearest neighbors models} \label{subsec:knnMultiple}
+\subsubsection{Multiple K-nearest neighbors models} \label{subsubsec:knnMultiple}
 \paragraph{}We took a look back at the slides provided with the assignment and we focused on the features (sensors) of the datasets. We noticed that the features are not in the same units. Thus, we thought about using multiple 1-nearest neighbor models with one 1-NN model per feature. This idea was motivated by the fact that we though we would obtained a better accuracy by using one 1-NN per feature because measurements in different units would not be mixed.\\
 We implemented this approach in the file \texttt{knn\_splitted\_1.py}. This yields a score of 0.52 on Kaggle which is the same as the toy script provided with the assignment.
 
-\subsubsection{Mutiple K-nearest neighbors models and samples modification}
-\paragraph{}After the disappointing result obtained in \ref{subsec:knnMultiple}, we decided to take a better a look at the datasets. We noticed that some samples were vectors full of -999999.99. We though that these measurements would badly influenced the models. Thus, we decided to replace each sample that was a vector full of -999999.99 by a vector full of 0.\\
+\subsubsection{Mutiple K-nearest neighbors models and samples modification} \label{subsubsec:knnMultipleModif}
+\paragraph{}After the disappointing result obtained in \ref{subsubsec:knnMultiple}, we decided to take a better a look at the datasets. We noticed that some samples were vectors full of -999999.99. We though that these measurements would badly influenced the models. Thus, we decided to replace each sample that was a vector full of -999999.99 by a vector full of 0.\\
 We implemented this approach in the file \texttt{knn\_splitted\_1\_filtered.py} and the score obtained on Kaggle was 0.53142.
 
 \subsubsection{Conclusion on K-nearest neighbors}
@@ -147,11 +147,11 @@ The codes for the different plots are available inside the Jupyter notebooks \te
 \subsection{Decision trees}\label{subsec:dt}
 \paragraph{}Secondly, we decided to use the decision tree method because its interpretability is very easy and the effect of the parameters is easy to understand.
 
-\subsubsection{Decision tree with min\_sample\_split=2}
+\subsubsection{Decision tree with min\_sample\_split=2} \label{subsubsec:dt2}
 \paragraph{}First, we try a very simple decision tree with the parameter \texttt{min\_sample\_split} set to 2. We decided to choose this value for that parameter because we wanted to have a first result for the decision tree on which we could based our further study of the approach.\\
 This model has been implemented in the file \texttt{dt\_basic\_2.py}. It has an accuracy of 0.8074285714285715 measured with a 10-fold cross validation strategy and provided a score of 0.38571 on Kaggle.
 
-\subsubsection{Decision tree with post-pruning}
+\subsubsection{Decision tree with post-pruning} \label{subsubsec:dtPruning}
 \paragraph{}We decided to study the accuracy of the decision tree depending on the value of the \texttt{min\_sample\_split} parameter. In order to do, we decided to study the accuracy for values of the parameter ranging from 2 to 15500. We obtained the following graph:
 \begin{figure}[H]
 \centering
@@ -184,19 +184,19 @@ Based on the obtained data, we found out that the value of alpha that provides t
 So, for our next model, we built a decision tree with this particular value of alpha for pruning. This particular model provided an accuracy of 0.8025714285714285 using a 10-fold cross validation approach and a score of 0.40285 on Kaggle, which is small improvement compared to the score 0.38571 obtained without pruning.\\
 The analysis performed for this subsection is available in the Jupyter notebook \texttt{dt.ipnyb} and the implementation of the model in the file \texttt{dt\_pruned.py}.
 
-\subsubsection{Decision tree with filtered data}
+\subsubsection{Decision tree with filtered data} \label{subsubsec:dtFiltered}
 \paragraph{}As explained in section \ref{sec:data-pre-process}, the data provided is not ideal. Thus, we decided to try a decision tree with pre-processed data.\\
 This model is implemented in the file \texttt{dt\_filtered.py}. This particular model provided an accuracy of 0.7928571428571429 using a 10-fold cross validation approach\footnote{Available in the Jupyter notebook \texttt{dt\_filtered.ipynb}.} and a score of 0.43428 on Kaggle. This is an improvement compared to the 0.40285 obtained with pruning.
 
-\subsection{Decision tree pruned with filtered data}
-\paragraph{}TO BE TRIED!
+\subsubsection{Conclusion on decision trees}
+\textcolor{red}{TO BE ADDED}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Random forests}
 \paragraph{}Next, we decided to use random forests because they should provide better accuracies than decision trees. Yet, their interpretability is still easy.
 
-\subsubsection{Random forest with 40 trees}
+\subsubsection{Random forest with 40 trees} \label{subsubsec:rf40Trees}
 \paragraph{}First, we decided to try a few forests and measuring their accuracies using a 10-fold cross validation approach. We obtained the following results:
 \begin{table}[H]
 \centering
@@ -212,7 +212,7 @@ This model is implemented in the file \texttt{dt\_filtered.py}. This particular 
 \label{tab:rf-acc}
 \end{table}
 Based on table \ref{tab:rf-acc}, the first conclusion we draw was that increasing the number of trees and diminishing the value of \texttt{min\_sample\_split} increases the accuracy measured with a 10-fold cross validation approach.
-\paragraph{}Then, we decided to study the accuracy of the forest based on the number of trees with a fixed value for \texttt{min\_sample\_split} (arbitrarily set to 25). We obtained the following graph:\newpage
+\paragraph{}Then, we decided to study the accuracy of the forest based on the number of trees with a fixed value for \texttt{min\_sample\_split} (arbitrarily set to 25). We obtained the following graph:
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.4]{rf/rf_basic_accuracies.png}
@@ -231,12 +231,51 @@ As we can see on figure \ref{fig:rf-acc-2}, the smaller the value of \texttt{min
 This model is implemented in the file \texttt{rf\_40\_25.py} and the analysis performed is available in the Jupyter notebook \texttt{random\_forest.ipynb}.\\
 This model provided an accuracy of 0.9288571428571428 using a 10-fold cross validation strategy and a score of 0.52 on Kaggle. This score on Kaggle is the same as the one obtained for 1-NN. Yet, this is an improvement compared to the scores obtained for the decisions tree in the part \ref{subsec:dt} of this report. This is what was expected because random forests use multiple trees.
 
-\subsubsection{Random forest with filtered data}
+\subsubsection{Random forest with filtered data} \label{subsubsec:rfFiltered}
 \paragraph{}As explained in section \ref{sec:data-pre-process}, the data provided is not ideal. Thus, we decided to try a random forest with pre-processed data. We kept the same values for the number of trees and \texttt{min\_sample\_split}.\\
 This model is implemented in the file \texttt{rf\_filtered.py}. This particular model provides an accuracy of 0.9074285714285713 using a 10-fold cross validation approach\footnote{Available in the Jupyter notebook \texttt{random\_forest\_filtered.ipynb}.} and a score of 0.48285 on Kaggle. This is less than what we obtained for a random forest without filtering the data.
 
-\subsubsection{Random forest with pruning}
-\paragraph{}TO BE TRIED!
+\subsubsection{Conclusion on random forests}
+\paragraph{}\textcolor{red}{TO BE ADDED!}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Support vector machines}
+\paragraph{}For completeness, we wanted to try support vector machines.
+
+\subsubsection{Support vector classification} \label{subsubsec:svc}
+\paragraph{}This approach is based on the model SVC of scikit-learn\footnote{sklearn.svm.SVC.}. We decided to study the accuracy of this model by splitting the learning set based on the ids of the 5 subjects and by using feature selection.\\
+For our first study, we decided to consider a wide range for the value of the regularization parameter\footnote{Denoted C in scikit-learn.}. We choose the range [1.0, 1000.0] has a starting point and obtained the following graph of accuracies depending on the value of the parameter:
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{svm/svm_svc_accuracies_1.png}
+\caption{Accuracy of SVC depending on regularization parameter}
+\end{figure}
+As we can see on the previous plot, it seems there is not an obvious relation between the regularization and the accuracy of the model. Thus, we decided to study the accuracy of the model for values of the regularization in the range [1.0, 100.0]. We obtained the following graph:
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{svm/svm_svc_accuracies_2.png}
+\caption{Accuracy of SVC depending on regularization parameter}
+\end{figure}
+Once again, it seems there is no obvious relation between the regularization and the accuracy. Yet, the values for the previous graphs were obtained as averages on 10 tries. We decided to increase the number of tries to 20. We obtained the following graph:
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{svm/svm_svc_accuracies_4.png}
+\caption{Accuracy of SVC depending on regularization parameter}
+\end{figure}
+The peak observed on the graph is for a value of the regularization parameter of 60. Thus, we decided to use a SVM (specifically \texttt{sklearn.svm.SVC}) with a value of 60 as the regularization parameter. This models has an accuracy 0.5956468368018641 locally obtained by splitting the learning set based on the ids of the 5 subjects and by using feature selection\footnote{The accuracies are averages over 20 tries.}. This model gives a score of 0.49428 on Kaggle.\\
+The study performed for this model is available in the Jupyter notebook \texttt{svc-feature-extract\\ion.ipynb} and the implementation of the model in the file \texttt{svc-reg-60.py}.
+
+\subsubsection{Support vector classification - $\nu$-SVC} \label{subsubsec:nusvc}
+\paragraph{}This approach is based on the model $\nu$-SVC of scikit-learn\footnote{sklearn.svm.NuSVC}. As always, we decided to study the accuracy of the model depending on the value of the parameter $\nu$. To study the accuracy, we split the learning set based on the ids of the 5 subjects and by calculating average accuracies over multiples splits. We used feature selection to reduce the size of the learning set.\\
+We study the accuracy of the model for values of $\nu$ in [0.1, 0.6]. We obtained the following graph:
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{nusvm/svm_nu_svc_accuracies_1.png}
+\caption{Accuracy of $\nu$-SVC depending on value of $\nu$}
+\end{figure}
+The peak observed on the graph is for a value of $\nu$ of 0.5. Thus, we decided to use a $\nu$-SVC with $\nu = 0.5$. This model has an accuracy 0.5723277462764307 locally measured as explained before and a score on Kaggle of 0.56571.\\
+The code for the generation of the graph is available in the Jupyter notebook \texttt{nusvc-feature-\\extraction.ipynb} and the implementation of the model in the file \texttt{nusvc.py}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -244,50 +283,34 @@ This model is implemented in the file \texttt{rf\_filtered.py}. This particular 
 \paragraph{}The following table summaries the techniques we have tried and the scores we have obtained on Kaggle.
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|}
+\begin{tabular}{|l|l|l|}
 \hline
-\multicolumn{1}{|c|}{\textbf{Approach}}          & \multicolumn{1}{c|}{\textbf{Kaggle score}} \\ \hline
-1-NN                                             & 0.52                                       \\ \hline
-25-NN                                            & 0.54                                       \\ \hline
-55-NN                                            & 0.53142                                    \\ \hline
-49-NN                                            & 0.52571                                    \\ \hline
-Multiple 1-NN                                    & 0.52                                       \\ \hline
-Multiple 1-NN with filtered data                 & 0.53142                                    \\ \hline
-Decision tree - min\_sample\_split=2                        & 0.38571                                    \\ \hline
-Decision tree with pruning                                  & 0.40285                                    \\ \hline
-Decision tree with filtered data                            & 0.43428                                    \\ \hline
-Random forest - 40 trees - min\_sample\_split=25 & 0.52                                       \\ \hline
-Random forest - filtered data                    & 0.48285                                    \\ \hline
+\multicolumn{1}{|c|}{\textbf{Approach}}                     & \multicolumn{1}{c|}{\textbf{Report section}} & \multicolumn{1}{c|}{\textbf{Kaggle score}} \\ \hline
+1-NN                                                        & \ref{subsubsec:1NN}                          & 0.52                                       \\ \hline
+25-NN                                                       & \ref{subsubsec:25NN}                         & 0.54                                       \\ \hline
+55-NN                                                       & \ref{subsubsec:55-49-NN}                     & 0.53142                                    \\ \hline
+49-NN                                                       & \ref{subsubsec:55-49-NN}                     & 0.52571                                    \\ \hline
+Multiple 1-NN                                               & \ref{subsubsec:knnMultiple}                  & 0.52                                       \\ \hline
+Multiple 1-NN with filtered data                            & \ref{subsubsec:knnMultipleModif}             & 0.53142                                    \\ \hline
+Decision tree - min\_sample\_split=2                        & \ref{subsubsec:dt2}                          & 0.38571                                    \\ \hline
+Decision tree with pruning                                  & \ref{subsubsec:dtPruning}                    & 0.40285                                    \\ \hline
+Decision tree with filtered data                            & \ref{subsubsec:dtFiltered}                   & 0.43428                                    \\ \hline
+Random forest - 40 trees - min\_sample\_split=25            & \ref{subsubsec:rf40Trees}                    & 0.52                                       \\ \hline
+Random forest - filtered data                               & \ref{subsubsec:rfFiltered}                   & 0.48285                                    \\ \hline
+MLP - 1 inner layer - 500 neurons                           & TO BE ADDED                                  & 0.48285                                    \\ \hline
+MLP - 1 inner layer - 100 neurons                           & TO BE ADDED                                  & 0.43428                                    \\ \hline
+MLP - 1 inner layer - 100 neurons - feature extraction      & TO BE ADDED                                  & 0.22                                       \\ \hline
+25-NN with feature extraction                               & TO BE ADDED                                  & 0.45714                                    \\ \hline
+Random forest - 1000 trees with feature extraction          & TO BE ADDED                                  & 0.87428                                    \\ \hline
+Logistic regression with feature extraction                 & TO BE ADDED                                  & 0.48285                                    \\ \hline
+SVM with feature extraction                                 & TO BE ADDED                                  & 0.07142                                    \\ \hline
+SGD with feature extraction                                 & TO BE ADDED                                  & 0.07142                                    \\ \hline
+SVM with feature extraction                                 & \ref{subsubsec:svc}                          & 0.49428                                    \\ \hline
+NuSVC with feature extraction                               & \ref{subsubsec:nusvc}                        & 0.56571                                    \\ \hline
+Random forest - 1000 trees with improved feature extraction & TO BE ADDED                                  & 0.91142                                    \\ \hline
 \end{tabular}
 \caption{Approaches with respective Kaggle scores}
 \end{table}
-
-
-\subsection{Support vector machines}
-\paragraph{}For completeness, we wanted to try support vector machines.
-
-\subsubsection{Support vector classification}
-\paragraph{}This approach is based on the model SVC of scikit-learn\footnote{sklearn.svm.SVC.}. We decided to do study the accuracy of this model by splitting the learning set based on the ids of the 5 subjects and by using feature selection.\\
-For our first study, we decided to consider a wide range for the value of the regularization parameter\footnote{Denoted C in scikit learn.}. We choose the range [1.0, 1000.0] has a starting point and obtained the following graph of accuracies depending on the value of the parameter:
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.4]{svm/svm_svc_accuracies_1.png}
-\caption{Accuracy of SVC depending on regularization parameter}
-\end{figure}
-As we can see on the previous plot, it seems there is not an obvious relation between the regularization and the accuracy of the model. Thus, we decided to study the accuracy of the model for values of the regularization in the range [1.0, 100.0]. We obtained the following graph:\newpage
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.4]{svm/svm_svc_accuracies_2.png}
-\caption{Accuracy of SVC depending on regularization parameter}
-\end{figure}
-Once again, it seems there is no obvious relation between the regularization and the accuracy. Yet, the values for the previous graphs were obtained as averages on 10 tries. We decided to increase the number of tries. We obtained the following graph:
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.4]{svm/svm_svc_accuracies_4.png}
-\caption{Accuracy of SVC depending on regularization parameter}
-\end{figure}
-The peak observed on the graph is for a value of the regularization parameter of 60. Thus, we decided to use a SVM (specifically sklearn.svm.SVC) with a value of 60 as the regularization parameter. This models has an accuracy 0.5956468368018641 locally obtained by splitting the learning set based on the ids of the 5 subjects and by using feature selection\footnote{The accuracies are averages over 20 tries.}. \textcolor{red}{Add Kaggle score if any}.\\
-The study performed for this model is available in the Jupyter notebook \texttt{svc-feature-extract\\ion.ipynb} and the implementation of the model in the file \texttt{svc-reg-60.py}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}

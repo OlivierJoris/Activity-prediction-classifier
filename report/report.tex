@@ -71,22 +71,23 @@ and different approaches we tried in order to solve the problems linked to the d
 \paragraph{}The learning set contained a certain number of missing values represented by the \texttt{-999999.99} value. We thus started by looking at several 
 methods proposed by the scikit-learn library\footnote{\url{https://scikit-learn.org/stable/modules/impute.html}} to replace these missing values. We tried several of these methods and finally decided to use the \texttt{KNNImputer} which completes missing values using k-nearest neighbors : each missing value is imputed using the mean value from the nearest neighbors found in the training set. 
 
-\subsection{Feature selection}
+\subsection{Observations about the samples}
 
-\begin{center}
-    \begin{minipage}{0.5\linewidth}
-    \includegraphics[width=\linewidth]{preprocessing/activity_repartition.png}
-    \end{minipage}%
-    \begin{minipage}{0.5\linewidth}
-    \includegraphics[width=\linewidth]{preprocessing/subjects_repartition.png}
+\begin{figure}[H]
+\center
+\includegraphics[scale = 0.5]{preprocessing/subjects_repartition.png}
+\caption{Repartition of the different subject ID's in the learning set.}
+\label{subject_repartition}
+\end{figure}
 
-    \end{minipage}
-\end{center}
+\paragraph{}We observed that the learning set seems to be balanced. The activity ID's are well distributed: they are each composed of 250 instances of the subjects in the training set. However, when looking at the subject ID's of the learning set, we observed that some subjects have been less used to perform measures. This can be observed on the figure \ref{subject_repartition}.
+This can lead to overfit: all subjects have not the same behavior when perfoming an activity and the sensors measures are correlated to one subject. We tried to make the sample relative to sensors and did feature selection on them to handle this problem. It was then difficult to predict the activity of the input subjects because the samples were not anymore link to one subject. We did not really find others solutions.
 
 \paragraph{}We observed that the learning set seems to be balanced. We can see on the figure at the top right that the activity ID's are well distributed: they are each composed of 250 instances of the subjects in the training set. However, when looking at the subject ID's of the learning set, we observed that some subjects have been less used to perform measures. This can be observed on the figure at the top right.
 This can lead to overfit: all subjects have not the same behavior when performing an activity and the sensors measures are correlated to one subject.
 
 \paragraph{}These observations and the fact that the dataset was really huge (3500 * 31 * 512 values), motivated us to perform features selection. We decided to perform feature selection using \texttt{SelectFromModel}\footnote{\url{https://scikit-learn.org/stable/modules/feature_selection.html}}. It is performing ranking based on one estimator and then remove the less ranked features recursively. We chose the \texttt{ExtraTreeClassifier}\footnote{\url{https://www.geeksforgeeks.org/ml-extra-tree-classifier-for-feature-selection/}} as estimator for this method. It is similar to a random tree classifier and only differ in the manner it is constructed which lead to the creation of multiple de-correlated decision trees. This seems us to be a good model to rank the features because we have seen in the theoretical course that decision trees are nice to discriminate features but are too much related to the dataset. It is why the way the Extremely Randomized Trees are constructed reduce the variance link to the dataset and thus reduce the chances of overfitting.
+\paragraph{}The fact that the feature sizes were really huge (31 * 512 features per subject), motivated us to perform features selection. We decided to perform feature selection using \texttt{SelectFromModel}\footnote{\url{https://scikit-learn.org/stable/modules/feature_selection.html}}. It is perfoming ranking based on one estimator and then remove the less ranked features recursively. We chose the \texttt{ExtraTreeClassifier}\footnote{\url{https://www.geeksforgeeks.org/ml-extra-tree-classifier-for-feature-selection/}} as estimator for this method. It is similiar to a random tree classifier and only differ in the manner it is constructed which lead to the creation of multiple de-correlated decision trees. This seems us to be a good model to rank the features because we have seen in the theoritical course that decision trees are nice to discriminate features but are too much related to the dataset. It is why the way the Extremely Randomized Trees are constructed reduce the variance link to the dataset and thus reduce the chances of overfitting.
 
 \subsection{Implementation}
 

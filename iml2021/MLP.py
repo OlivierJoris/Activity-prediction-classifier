@@ -1,24 +1,24 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+# Authors: Maxime Goffart and Olivier Joris
 
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 
 from sklearn.neural_network import MLPClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import SelectFromModel
 from sklearn.impute import KNNImputer
 from sklearn.model_selection import cross_val_score
 
-# Author: Antonio Sutera & Yann Claess
 def load_data(data_path):
+    """
+    Load the data for the classifer.
+    Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+    Argument:
+    ---------
+    - `data_path`: Path to the data folder.
+    """
 
     FEATURES = range(2, 33)
     N_TIME_SERIES = 3500
@@ -42,8 +42,16 @@ def load_data(data_path):
 
     return X_train, y_train, X_test
 
-# Author: Antonio Sutera & Yann Claess
 def write_submission(y, where, submission_name='toy_submission.csv'):
+    """
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+    Arguments:
+    ----------
+    - `y`: Predictions to write.
+    - `where`: Path to the file in which to write.
+    - `submission_name`: Name of the file.
+    """
 
     os.makedirs(where, exist_ok=True)
 
@@ -73,60 +81,33 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
 
     print('Submission {} saved in {}.'.format(submission_name, SUBMISSION_PATH))
 
-
-# In[2]:
-
-
 if __name__ == '__main__':
     # Directory containing the data folders
     DATA_PATH = 'data'
     X_train, y_train, X_test = load_data(DATA_PATH)
 
+    # Replace missing values
+    imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
+    X_train = imputer.fit_transform(X_train)
+    
+    # Feature selection
+    print("Shape before feature selection: " + str(X_train.shape))
 
-# In[3]:
+    selector = SelectFromModel(estimator = etc).fit(X_train, y_train)
+    X_train = selector.transform(X_train)
+    X_test = selector.transform(X_test)
 
-
-# Replace missing values
-imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
-X_train = imputer.fit_transform(X_train)
-
-
-# In[ ]:
-
-
-# Feature selection
-
-print("Shape before feature selection: " + str(X_train.shape))
-
-selector = SelectFromModel(estimator = etc).fit(X_train, y_train)
-X_train = selector.transform(X_train)
-X_test = selector.transform(X_test)
-
-print("Shape after feature selection: " + str(X_train.shape))
+    print("Shape after feature selection: " + str(X_train.shape))
 
 
-# In[5]:
+    clf = MLPClassifier(hidden_layer_sizes = (500,), random_state = 0)
+    scores = cross_val_score(clf, X_train, y_train, cv = 10, n_jobs = -1)
+    score = scores.mean()
 
+    print(score)
 
-clf = MLPClassifier(hidden_layer_sizes = (500,), random_state = 0)
-scores = cross_val_score(clf, X_train, y_train, cv = 10, n_jobs = -1)
-score = scores.mean()
+    clf.fit(X_train, y_train)
 
-print(score)
+    y_test = clf.predict(X_test)
 
-
-# In[6]:
-
-
-clf.fit(X_train, y_train)
-
-y_test = clf.predict(X_test)
-
-write_submission(y_test, 'submissions')
-
-
-# In[ ]:
-
-
-
-
+    write_submission(y_test, 'submissions')

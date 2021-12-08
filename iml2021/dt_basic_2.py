@@ -86,6 +86,7 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
     - `where`: Path to the file in which to write.
     - `submission_name`: Name of the file.
     """
+
     os.makedirs(where, exist_ok=True)
 
     SUBMISSION_PATH = os.path.join(where, submission_name)

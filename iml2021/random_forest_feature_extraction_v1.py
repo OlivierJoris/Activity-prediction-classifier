@@ -1,40 +1,26 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[9]:
-
-
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+# Authors: Maxime Goffart and Olivier Joris
 
 import os
 import numpy as np
-import matplotlib.pyplot as plt
-import entropy as ent
 import random
 
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.feature_selection import SelectFromModel
 from sklearn.impute import KNNImputer
-from sklearn.model_selection import cross_val_score
 from scipy import stats
 from scipy.signal import find_peaks
-from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import ShuffleSplit
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
-from sklearn.linear_model import LogisticRegression, SGDClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import StackingClassifier
-from sklearn.pipeline import make_pipeline
-from sklearn.ensemble import VotingClassifier
 
-# Author: Antonio Sutera & Yann Claess
 def load_data(data_path):
+    """
+    Load the data for the classifer.
+    Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+    Argument:
+    ---------
+    - `data_path`: Path to the data folder.
+    """
 
     FEATURES = range(2, 33)
     N_TIME_SERIES = 3500
@@ -58,8 +44,16 @@ def load_data(data_path):
 
     return X_train, y_train, X_test
 
-# Author: Antonio Sutera & Yann Claess
 def write_submission(y, where, submission_name='toy_submission.csv'):
+    """
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+    Arguments:
+    ----------
+    - `y`: Predictions to write.
+    - `where`: Path to the file in which to write.
+    - `submission_name`: Name of the file.
+    """
 
     os.makedirs(where, exist_ok=True)
 
@@ -89,11 +83,21 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
 
     print('Submission {} saved in {}.'.format(submission_name, SUBMISSION_PATH))
 
-
-# In[1]:
-
-
 def feature_extraction(X_train, X_test, data_path):
+    """
+    Feature extraction.
+
+    Arguments:
+    ----------
+    - `X_train`: Inputs of LS.
+    - `X_test`: Inputs of TS.
+    - `data_path`: Path to the data folder.
+    
+    Return:
+    -------
+    Inputs of LS and TS after feature extraction.
+    """
+
     FEATURES = range(2, 33)
     THREE_DIM_FEATURES = [4, 7, 10, 14, 17, 20, 24, 27, 30]
     ONE_DIM_FEATURES = [2, 3, 13, 23]
@@ -214,94 +218,69 @@ def feature_extraction(X_train, X_test, data_path):
 
     return new_X_train, new_X_test
 
-
-# In[3]:
-
-
 if __name__ == '__main__':
     # Directory containing the data folders
     DATA_PATH = 'data'
     init_X_train, y_train, init_X_test = load_data(DATA_PATH)
 
 
-# In[4]:
+    # Replace missing values
+    imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
+    init_X_train = imputer.fit_transform(init_X_train)
+
+    # Feature extraction
+    X_train, X_test = feature_extraction(init_X_train, init_X_test, DATA_PATH)
 
 
-# Replace missing values
-imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
-init_X_train = imputer.fit_transform(init_X_train)
+    LS_path = os.path.join(DATA_PATH, 'LS')   
+    LS_subject_id = np.loadtxt(os.path.join(LS_path, 'subject_Id.txt'))
 
+    iter_nb = 10
 
-# In[5]:
+    ids = [1, 2, 3, 4, 5]
+    learning_id = [0, 0, 0]   
+    scores = np.zeros(iter_nb)
 
+    random.seed()
 
-# Feature extraction
-X_train, X_test = feature_extraction(init_X_train, init_X_test, DATA_PATH)
+    learning_id = [0,0,0]
 
-
-# In[13]:
-
-
-LS_path = os.path.join(DATA_PATH, 'LS')   
-LS_subject_id = np.loadtxt(os.path.join(LS_path, 'subject_Id.txt'))
-
-iter_nb = 10
-
-ids = [1, 2, 3, 4, 5]
-learning_id = [0, 0, 0]   
-scores = np.zeros(iter_nb)
-
-random.seed()
-
-learning_id = [0,0,0]
-
-for j in range(iter_nb):
-    random.shuffle(ids)
-    
-    for i in range(3):
-        learning_id[i] = ids[i]
+    for j in range(iter_nb):
+        random.shuffle(ids)
         
-    unique_ls, count_ls = np.unique(LS_subject_id, return_counts = True)
-    
-    count = np.asarray((unique_ls, count_ls))
-    
-    training_size = int(count[1][learning_id[0] - 1] + count[1][learning_id[1] - 1] + count[1][learning_id[2] - 1])
-    
-    X_train_split = np.zeros((training_size, X_train.shape[1]))
-    X_test_split = np.zeros((3500 - training_size, X_test.shape[1]))
+        for i in range(3):
+            learning_id[i] = ids[i]
+            
+        unique_ls, count_ls = np.unique(LS_subject_id, return_counts = True)
+        
+        count = np.asarray((unique_ls, count_ls))
+        
+        training_size = int(count[1][learning_id[0] - 1] + count[1][learning_id[1] - 1] + count[1][learning_id[2] - 1])
+        
+        X_train_split = np.zeros((training_size, X_train.shape[1]))
+        X_test_split = np.zeros((3500 - training_size, X_test.shape[1]))
 
-    y_train_split = np.zeros((training_size))
-    y_test_split = np.zeros((3500 - training_size))
+        y_train_split = np.zeros((training_size))
+        y_test_split = np.zeros((3500 - training_size))
 
-    training_current_size, testing_current_size = 0, 0
+        training_current_size, testing_current_size = 0, 0
 
-    for i in range(3500):
-        if LS_subject_id[i] in learning_id:
-            X_train_split[training_current_size] = X_train[i]
-            y_train_split[training_current_size] = y_train[i]
-            training_current_size += 1
-        else:
-            X_test_split[testing_current_size] = X_train[i]
-            y_test_split[testing_current_size] = y_train[i]
-            testing_current_size += 1
-    
-    rf = RandomForestClassifier(random_state = 0, n_estimators = 1000).fit(X_train_split, y_train_split)
-    y_pred = rf.predict(X_test_split)
-    scores[j] = accuracy_score(y_test_split, y_pred)
+        for i in range(3500):
+            if LS_subject_id[i] in learning_id:
+                X_train_split[training_current_size] = X_train[i]
+                y_train_split[training_current_size] = y_train[i]
+                training_current_size += 1
+            else:
+                X_test_split[testing_current_size] = X_train[i]
+                y_test_split[testing_current_size] = y_train[i]
+                testing_current_size += 1
+        
+        rf = RandomForestClassifier(random_state = 0, n_estimators = 1000).fit(X_train_split, y_train_split)
+        y_pred = rf.predict(X_test_split)
+        scores[j] = accuracy_score(y_test_split, y_pred)
 
-print(np.mean(scores))
+    print(np.mean(scores))
 
-
-# In[12]:
-
-
-clf = RandomForestClassifier(random_state = 0, n_estimators = 1000).fit(X_train, y_train)
-y_test = clf.predict(X_test)
-write_submission(y_test, 'submissions')
-
-
-# In[ ]:
-
-
-
-
+    clf = RandomForestClassifier(random_state = 0, n_estimators = 1000).fit(X_train, y_train)
+    y_test = clf.predict(X_test)
+    write_submission(y_test, 'submissions')

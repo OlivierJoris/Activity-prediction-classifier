@@ -1,18 +1,19 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-$
+# -*- coding: utf-8 -*-
 # Authors: Maxime Goffart and Olivier Joris
-# Based on Antonio Sutera & Yann Claes (toy_script.py)
 
 import os
 import numpy as np
 
-from sklearn.neighbors import KNeighborsClassifier
-
+from sklearn.neural_network import MLPClassifier
+from sklearn.feature_selection import SelectFromModel
+from sklearn.impute import KNNImputer
+from sklearn.ensemble import ExtraTreesClassifier
 
 def load_data(data_path):
     """
     Load the data for the classifer.
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Argument:
     ---------
@@ -28,6 +29,7 @@ def load_data(data_path):
     X_train, X_test = [np.zeros((N_TIME_SERIES, (len(FEATURES) * 512))) for i in range(2)]
 
     for f in FEATURES:
+        print("Loading {}".format(f))
         data = np.loadtxt(os.path.join(LS_path, 'LS_sensor_{}.txt'.format(f)))
         X_train[:, (f-2)*512:(f-2+1)*512] = data
         data = np.loadtxt(os.path.join(TS_path, 'TS_sensor_{}.txt'.format(f)))
@@ -41,10 +43,9 @@ def load_data(data_path):
 
     return X_train, y_train, X_test
 
-
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -82,14 +83,15 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
     print('Submission {} saved in {}.'.format(submission_name, SUBMISSION_PATH))
 
 if __name__ == '__main__':
-
     # Directory containing the data folders
     DATA_PATH = 'data'
     X_train, y_train, X_test = load_data(DATA_PATH)
 
-    clf = KNeighborsClassifier(n_neighbors=25)
+    clf = MLPClassifier(hidden_layer_sizes = (500,), random_state = 0)
+    print("Fit...")
     clf.fit(X_train, y_train)
 
+    print("Predict...")
     y_test = clf.predict(X_test)
 
-    write_submission(y_test, 'submissions', submission_name='knn_basic_25.csv')
+    write_submission(y_test, 'submissions', submission_name='13_500_neurons_MLP.csv')

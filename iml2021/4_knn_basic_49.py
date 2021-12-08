@@ -1,17 +1,17 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# Authors: Antonio Sutera & Yann Claes (toy_script.py)
+# Authors: Maxime Goffart and Olivier Joris
+# Based on Antonio Sutera & Yann Claes (toy_script.py)
 
 import os
 import numpy as np
 
 from sklearn.neighbors import KNeighborsClassifier
 
-
 def load_data(data_path):
     """
     Load the data for the classifer.
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Argument:
     ---------
@@ -43,7 +43,7 @@ def load_data(data_path):
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -86,9 +86,9 @@ if __name__ == '__main__':
     DATA_PATH = 'data'
     X_train, y_train, X_test = load_data(DATA_PATH)
 
-    clf = KNeighborsClassifier(n_neighbors=1)
+    clf = KNeighborsClassifier(n_neighbors=49)
     clf.fit(X_train, y_train)
 
     y_test = clf.predict(X_test)
 
-    write_submission(y_test, 'submissions', submission_name='knn_basic_1.csv')
+    write_submission(y_test, 'submissions', submission_name='4_knn_basic_49.csv')

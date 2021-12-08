@@ -6,10 +6,10 @@ import os
 import numpy as np
 import random
 
+from sklearn.svm import SVC
 from sklearn.impute import KNNImputer
 from scipy import stats
 from scipy.signal import find_peaks
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 
 def load_data(data_path):
@@ -31,6 +31,7 @@ def load_data(data_path):
     X_train, X_test = [np.zeros((N_TIME_SERIES, (len(FEATURES) * 512))) for i in range(2)]
 
     for f in FEATURES:
+        print("Loading {}".format(f))
         data = np.loadtxt(os.path.join(LS_path, 'LS_sensor_{}.txt'.format(f)))
         X_train[:, (f-2)*512:(f-2+1)*512] = data
         data = np.loadtxt(os.path.join(TS_path, 'TS_sensor_{}.txt'.format(f)))
@@ -223,7 +224,6 @@ if __name__ == '__main__':
     DATA_PATH = 'data'
     init_X_train, y_train, init_X_test = load_data(DATA_PATH)
 
-
     # Replace missing values
     imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
     init_X_train = imputer.fit_transform(init_X_train)
@@ -231,56 +231,6 @@ if __name__ == '__main__':
     # Feature extraction
     X_train, X_test = feature_extraction(init_X_train, init_X_test, DATA_PATH)
 
-
-    LS_path = os.path.join(DATA_PATH, 'LS')   
-    LS_subject_id = np.loadtxt(os.path.join(LS_path, 'subject_Id.txt'))
-
-    iter_nb = 10
-
-    ids = [1, 2, 3, 4, 5]
-    learning_id = [0, 0, 0]   
-    scores = np.zeros(iter_nb)
-
-    random.seed()
-
-    learning_id = [0,0,0]
-
-    for j in range(iter_nb):
-        random.shuffle(ids)
-        
-        for i in range(3):
-            learning_id[i] = ids[i]
-            
-        unique_ls, count_ls = np.unique(LS_subject_id, return_counts = True)
-        
-        count = np.asarray((unique_ls, count_ls))
-        
-        training_size = int(count[1][learning_id[0] - 1] + count[1][learning_id[1] - 1] + count[1][learning_id[2] - 1])
-        
-        X_train_split = np.zeros((training_size, X_train.shape[1]))
-        X_test_split = np.zeros((3500 - training_size, X_test.shape[1]))
-
-        y_train_split = np.zeros((training_size))
-        y_test_split = np.zeros((3500 - training_size))
-
-        training_current_size, testing_current_size = 0, 0
-
-        for i in range(3500):
-            if LS_subject_id[i] in learning_id:
-                X_train_split[training_current_size] = X_train[i]
-                y_train_split[training_current_size] = y_train[i]
-                training_current_size += 1
-            else:
-                X_test_split[testing_current_size] = X_train[i]
-                y_test_split[testing_current_size] = y_train[i]
-                testing_current_size += 1
-        
-        rf = RandomForestClassifier(random_state = 0, n_estimators = 1000).fit(X_train_split, y_train_split)
-        y_pred = rf.predict(X_test_split)
-        scores[j] = accuracy_score(y_test_split, y_pred)
-
-    print(np.mean(scores))
-
-    clf = RandomForestClassifier(random_state = 0, n_estimators = 1000).fit(X_train, y_train)
+    clf = SVC(probability=True, gamma='auto', random_state = 0).fit(X_train, y_train)
     y_test = clf.predict(X_test)
-    write_submission(y_test, 'submissions', submission_name='17_random_forest_features_extraction.csv')
+    write_submission(y_test, 'submissions', submission_name='19_SVM_features_extraction.csv')

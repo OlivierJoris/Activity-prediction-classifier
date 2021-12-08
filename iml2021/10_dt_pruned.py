@@ -5,27 +5,26 @@
 import os
 import numpy as np
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.feature_selection import SelectFromModel
-from sklearn.impute import KNNImputer
 
-class DTFiltered:
+class DecisionTreePruned:
     """
-    Classifier that uses a decision tree with filtered data.
+    Classifier that uses a pruned decision tree.
     """
 
-    def __init__(self, min_sample_split):
+    def __init__(self, min_sample_split, ccp_alpha):
         """
         Argument:
         ---------
         - `min_sample_split`: min_sample_split for the tree.
+        - `ccp_alpha`: value for prunning.
         """
         self.min_sample_split = min_sample_split
+        self.ccp_alpha = ccp_alpha
     
     def load_data(self, data_path):
         """
         Load the data for the classifer.
-        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+        Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
         Argument:
         ---------
@@ -35,57 +34,33 @@ class DTFiltered:
         FEATURES = range(2, 33)
         N_TIME_SERIES = 3500
 
-        print("Loading data...")
-
         # Create the training and testing samples
         LS_path = os.path.join(data_path, 'LS')
         TS_path = os.path.join(data_path, 'TS')
-        X_train, X_test = [np.zeros((N_TIME_SERIES, (len(FEATURES) * 512))) for i in range(2)]
+        X_train = np.zeros((N_TIME_SERIES, (len(FEATURES) * 512)))
+        X_test = np.zeros((N_TIME_SERIES, (len(FEATURES) * 512)))
 
         for f in FEATURES:
-            print("Loading feature {}...".format(f))
             data = np.loadtxt(os.path.join(LS_path, 'LS_sensor_{}.txt'.format(f)))
             X_train[:, (f-2)*512:(f-2+1)*512] = data
             data = np.loadtxt(os.path.join(TS_path, 'TS_sensor_{}.txt'.format(f)))
             X_test[:, (f-2)*512:(f-2+1)*512] = data
         
         y_train = np.loadtxt(os.path.join(LS_path, 'activity_Id.txt'))
-
-        print('X_train size: {}.'.format(X_train.shape))
-        print('y_train size: {}.'.format(y_train.shape))
-        print('X_test size: {}.'.format(X_test.shape))
-
-        # Replace missing values
-        print("Replace missing values...")
-        imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
-        X_train = imputer.fit_transform(X_train)
-
-        # Features selection
-        print("Features selection...")
-        etc = ExtraTreesClassifier(n_estimators = 1000)
-        
-        print("X_train shape before feature selection: " + str(X_train.shape))
-        
-        print("SelectFromModel...")
-        selector = SelectFromModel(estimator = etc).fit(X_train, y_train)
-        print("Transform X_train...")
-        X_train = selector.transform(X_train)
-        print("Transform X_test...")
-        X_test = selector.transform(X_test)
-        
-        print("X_train shape after feature selection: " + str(X_train.shape))
-        print("y_train shape after feature selection: " + str(y_train.shape))
+        print('X_train len: {}.'.format(len(X_train)))
+        print('y_train len: {}.'.format(len(y_train)))
+        print('X_test len: {}.'.format(len(X_test)))
 
         self.X_train = X_train
         self.y_train = y_train
         self.X_test = X_test
-
+    
     def fit(self):
         """
         Fit the classifier.
         """
 
-        self.model = DecisionTreeClassifier(min_samples_split=self.min_sample_split)
+        self.model = DecisionTreeClassifier(min_samples_leaf=self.min_sample_split, ccp_alpha=self.ccp_alpha)
         self.model = self.model.fit(self.X_train, self.y_train)
 
     def predict(self):
@@ -105,7 +80,7 @@ class DTFiltered:
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -146,15 +121,12 @@ if __name__ == '__main__':
 
     # Directory containing the data folders
     DATA_PATH = 'data'
-    tree = DTFiltered(min_sample_split=2)
 
-    tree.load_data(DATA_PATH)
+    clf = DecisionTreePruned(min_sample_split=2, ccp_alpha=0.0006772486772486773)
+    clf.load_data(DATA_PATH)
+    clf.fit()
 
-    print("Fitting...")
-    tree.fit()
-
-    print("Predicting ...")
     predictions = np.zeros(3500, dtype=int)
-    predictions = tree.predict()
+    predictions = clf.predict()
 
-    write_submission(predictions, 'submissions', submission_name='dt_filtered.csv')
+    write_submission(predictions, 'submissions', submission_name='10_dt_pruned.csv')

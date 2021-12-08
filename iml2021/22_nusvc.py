@@ -13,7 +13,7 @@ from scipy.signal import find_peaks
 def load_data(data_path):
     """
     Load the data for the classifer.
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Argument:
     ---------
@@ -45,7 +45,7 @@ def load_data(data_path):
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -219,4 +219,4 @@ if __name__ == "__main__":
 
     # Writing CSV file
     print("Saving submission...")
-    write_submission(y_pred, 'submissions', submission_name='nusvc.csv')
+    write_submission(y_pred, 'submissions', submission_name='22_nusvc.csv')

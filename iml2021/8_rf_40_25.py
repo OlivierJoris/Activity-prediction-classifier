@@ -4,27 +4,27 @@
 
 import os
 import numpy as np
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 
-class DecisionTreePruned:
+class RandomForest:
     """
-    Classifier that uses a pruned decision tree.
+    Classifier that uses a random forest.
     """
 
-    def __init__(self, min_sample_split, ccp_alpha):
+    def __init__(self, n_estimators,min_sample_split):
         """
         Argument:
         ---------
-        - `min_sample_split`: min_sample_split for the tree.
-        - `ccp_alpha`: value for prunning.
+        - `n_estimators`: number of trees in the forest.
+        - `min_sample_split`: min_sample_split for the trees in the forest.
         """
+        self.n_estimators = n_estimators
         self.min_sample_split = min_sample_split
-        self.ccp_alpha = ccp_alpha
     
     def load_data(self, data_path):
         """
         Load the data for the classifer.
-        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
         Argument:
         ---------
@@ -60,7 +60,7 @@ class DecisionTreePruned:
         Fit the classifier.
         """
 
-        self.model = DecisionTreeClassifier(min_samples_leaf=self.min_sample_split, ccp_alpha=self.ccp_alpha)
+        self.model = RandomForestClassifier(n_estimators=self.n_estimators, min_samples_split=self.min_sample_split, n_jobs=-1)
         self.model = self.model.fit(self.X_train, self.y_train)
 
     def predict(self):
@@ -80,7 +80,7 @@ class DecisionTreePruned:
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -122,11 +122,11 @@ if __name__ == '__main__':
     # Directory containing the data folders
     DATA_PATH = 'data'
 
-    clf = DecisionTreePruned(min_sample_split=2, ccp_alpha=0.0006772486772486773)
-    clf.load_data(DATA_PATH)
-    clf.fit()
+    forest = RandomForest(n_estimators=40, min_sample_split=25)
+    forest.load_data(DATA_PATH)
+    forest.fit()
 
     predictions = np.zeros(3500, dtype=int)
-    predictions = clf.predict()
+    predictions = forest.predict()
 
-    write_submission(predictions, 'submissions', submission_name='dt_pruned.csv')
+    write_submission(predictions, 'submissions', submission_name='8_forest_40trees_25mss.csv')

@@ -1,18 +1,17 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # Authors: Maxime Goffart and Olivier Joris
-# Based on Antonio Sutera & Yann Claes (toy_script.py)
 
 import os
 import numpy as np
 
 from sklearn.neighbors import KNeighborsClassifier
-
+from sklearn.impute import SimpleImputer
 
 def load_data(data_path):
     """
     Load the data for the classifer.
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Argument:
     ---------
@@ -41,10 +40,9 @@ def load_data(data_path):
 
     return X_train, y_train, X_test
 
-
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -87,9 +85,15 @@ if __name__ == '__main__':
     DATA_PATH = 'data'
     X_train, y_train, X_test = load_data(DATA_PATH)
 
-    clf = KNeighborsClassifier(n_neighbors=55)
-    clf.fit(X_train, y_train)
+    # Replace missing values
+    imp = SimpleImputer(missing_values=-999999.99, strategy='mean')
+    imp.fit(X_train)
+    X_train = imp.transform(X_train)
 
+    print(X_train.shape)
+
+    clf = KNeighborsClassifier(n_neighbors=25)
+    clf.fit(X_train, y_train)
     y_test = clf.predict(X_test)
 
-    write_submission(y_test, 'submissions', submission_name='knn_basic_55.csv')
+    write_submission(y_test, 'submissions', submission_name="7_knn.csv")

@@ -22,7 +22,7 @@ class KnnSplitted:
     def load_data(self, data_path):
         """
         Load the data for the classifer.
-        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
         Argument:
         ---------
@@ -91,7 +91,7 @@ class KnnSplitted:
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -140,4 +140,4 @@ if __name__ == '__main__':
     predictions = np.zeros(3500, dtype=int)
     predictions = clf.predict()
 
-    write_submission(predictions, 'submissions', submission_name='knn_splitted_1.csv')
+    write_submission(predictions, 'submissions', submission_name='5_knn_splitted_1.csv')

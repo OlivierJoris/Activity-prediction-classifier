@@ -39,7 +39,6 @@ def load_data(data_path):
 
     return X_train, y_train, X_test
 
-
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
     Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
@@ -90,4 +89,4 @@ if __name__ == '__main__':
 
     y_test = clf.predict(X_test)
 
-    write_submission(y_test, 'submissions', submission_name='knn_basic_1.csv')
+    write_submission(y_test, 'submissions', submission_name='1_knn_basic_1.csv')

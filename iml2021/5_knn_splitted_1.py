@@ -140,4 +140,4 @@ if __name__ == '__main__':
     predictions = np.zeros(3500, dtype=int)
     predictions = clf.predict()
 
-    write_submission(predictions, 'submissions', submission_name='knn_splitted_1.csv')
+    write_submission(predictions, 'submissions', submission_name='5_knn_splitted_1.csv')

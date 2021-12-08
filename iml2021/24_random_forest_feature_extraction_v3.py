@@ -15,7 +15,7 @@ from sklearn.metrics import accuracy_score
 def load_data(data_path):
     """
     Load the data for the classifer.
-    Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Argument:
     ---------
@@ -46,7 +46,7 @@ def load_data(data_path):
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -102,8 +102,8 @@ def feature_extraction(X_train, X_test, data_path):
     THREE_DIM_FEATURES = [4, 7, 10, 14, 17, 20, 24, 27, 30]
     ONE_DIM_FEATURES = [2, 3, 13, 23]
     N_TIME_SERIES = 3500
-    N_ONE_DIM_ATTRIB = 32
-    N_THREE_DIM_ATTRIB = 36
+    N_ONE_DIM_ATTRIB = 38
+    N_THREE_DIM_ATTRIB = 42
     
     LS_path = os.path.join(data_path, 'LS')
     TS_path = os.path.join(data_path, 'TS')
@@ -148,6 +148,21 @@ def feature_extraction(X_train, X_test, data_path):
                 new_X_train[i][index] = np.max(X_train[i][(f-2)*512:(f-2+1)*512])
                 new_X_test[i][index] = np.max(X_test[i][(f-2)*512:(f-2+1)*512])
                 
+                index += 1
+                # index of argmax
+                new_X_train[i][index] = np.argmax(np.abs(X_train[i][(f-2)*512:(f-2+1)*512]))
+                new_X_test[i][index] = np.argmax(np.abs(X_test[i][(f-2)*512:(f-2+1)*512]))
+                
+                index += 1
+                # index of argmin 
+                new_X_train[i][index] = np.argmin(np.abs(X_train[i][(f-2)*512:(f-2+1)*512]))
+                new_X_test[i][index] = np.argmin(np.abs(X_test[i][(f-2)*512:(f-2+1)*512]))
+                
+                index += 1
+                # diff between indexes
+                new_X_train[i][index] = abs(np.argmax(np.abs(X_train[i][(f-2)*512:(f-2+1)*512])) - np.argmin(np.abs(X_train[i][(f-2)*512:(f-2+1)*512])))
+                new_X_test[i][index] = abs(np.argmax(np.abs(X_test[i][(f-2)*512:(f-2+1)*512])) - np.argmin(np.abs(X_test[i][(f-2)*512:(f-2+1)*512])))
+
                 index += 1
                 # median absolute deviation
                 new_X_train[i][index] = np.apply_along_axis(lambda x: np.median(np.absolute(x - np.median(x))), 0, X_train[i][(f-2)*512:(f-2+1)*512])
@@ -387,6 +402,51 @@ def feature_extraction(X_train, X_test, data_path):
                 new_X_train[i][index] = np.max(comp_z_train)
                 new_X_test[i][index] = np.max(comp_z_test)
                 
+                index += 1
+                # index of argmax
+                new_X_train[i][index] = np.argmax(np.abs(comp_x_train))
+                new_X_test[i][index] = np.argmax(np.abs(comp_x_test))
+                
+                index += 1
+                # index of argmax
+                new_X_train[i][index] = np.argmax(np.abs(comp_y_train))
+                new_X_test[i][index] = np.argmax(np.abs(comp_y_test))
+                
+                index += 1
+                # index of argmax
+                new_X_train[i][index] = np.argmax(np.abs(comp_z_train))
+                new_X_test[i][index] = np.argmax(np.abs(comp_z_test))
+                
+                index += 1
+                # index of argmin
+                new_X_train[i][index] = np.argmin(np.abs(comp_x_train))
+                new_X_test[i][index] = np.argmin(np.abs(comp_x_test))
+                
+                index += 1
+                # index of argmin
+                new_X_train[i][index] = np.argmin(np.abs(comp_y_train))
+                new_X_test[i][index] = np.argmin(np.abs(comp_y_test))
+                
+                index += 1
+                # index of argmin
+                new_X_train[i][index] = np.argmin(np.abs(comp_z_train))
+                new_X_test[i][index] = np.argmin(np.abs(comp_z_test))
+                
+                index += 1
+                # diff between indexes
+                new_X_train[i][index] = abs(np.argmax(np.abs(comp_x_train) - np.argmin(np.abs(comp_x_train))))
+                new_X_test[i][index] = abs(np.argmax(np.abs(comp_x_test)) - np.argmin(np.abs(comp_x_test)))
+                
+                index += 1
+                # diff between indexes
+                new_X_train[i][index] = abs(np.argmax(np.abs(comp_y_train) - np.argmin(np.abs(comp_y_train))))
+                new_X_test[i][index] = abs(np.argmax(np.abs(comp_y_test)) - np.argmin(np.abs(comp_y_test)))
+                
+                index += 1
+                # diff between indexes
+                new_X_train[i][index] = abs(np.argmax(np.abs(comp_z_train) - np.argmin(np.abs(comp_z_train))))
+                new_X_test[i][index] = abs(np.argmax(np.abs(comp_z_test)) - np.argmin(np.abs(comp_z_test)))
+
                 index += 1
                 # median absolute deviation
                 new_X_train[i][index] = np.apply_along_axis(lambda x: np.median(np.absolute(x - np.median(x))), 0, comp_x_train)
@@ -646,6 +706,51 @@ def feature_extraction(X_train, X_test, data_path):
                 # max
                 new_X_train[i][index] = np.max(comp_z_train_freq)
                 new_X_test[i][index] = np.max(comp_z_test_freq)
+
+                index += 1
+                # index of argmax
+                new_X_train[i][index] = np.argmax(np.abs(comp_x_train_freq))
+                new_X_test[i][index] = np.argmax(np.abs(comp_x_test_freq))
+                
+                index += 1
+                # index of argmax
+                new_X_train[i][index] = np.argmax(np.abs(comp_y_train_freq))
+                new_X_test[i][index] = np.argmax(np.abs(comp_y_test_freq))
+                
+                index += 1
+                # index of argmax
+                new_X_train[i][index] = np.argmax(np.abs(comp_z_train_freq))
+                new_X_test[i][index] = np.argmax(np.abs(comp_z_test_freq))
+                
+                index += 1
+                # index of argmin
+                new_X_train[i][index] = np.argmin(np.abs(comp_x_train_freq))
+                new_X_test[i][index] = np.argmin(np.abs(comp_x_test_freq))
+                
+                index += 1
+                # index of argmin
+                new_X_train[i][index] = np.argmin(np.abs(comp_y_train_freq))
+                new_X_test[i][index] = np.argmin(np.abs(comp_y_test_freq))
+                
+                index += 1
+                # index of argmin
+                new_X_train[i][index] = np.argmin(np.abs(comp_z_train_freq))
+                new_X_test[i][index] = np.argmin(np.abs(comp_z_test_freq))
+                
+                index += 1
+                # diff between indexes
+                new_X_train[i][index] = abs(np.argmax(np.abs(comp_x_train_freq) - np.argmin(np.abs(comp_x_train_freq))))
+                new_X_test[i][index] = abs(np.argmax(np.abs(comp_x_test_freq)) - np.argmin(np.abs(comp_x_test_freq)))
+                
+                index += 1
+                # diff between indexes
+                new_X_train[i][index] = abs(np.argmax(np.abs(comp_y_train_freq) - np.argmin(np.abs(comp_y_train_freq))))
+                new_X_test[i][index] = abs(np.argmax(np.abs(comp_y_test_freq)) - np.argmin(np.abs(comp_y_test_freq)))
+                
+                index += 1
+                # diff between indexes
+                new_X_train[i][index] = abs(np.argmax(np.abs(comp_z_train_freq) - np.argmin(np.abs(comp_z_train_freq))))
+                new_X_test[i][index] = abs(np.argmax(np.abs(comp_z_test_freq)) - np.argmin(np.abs(comp_z_test_freq)))
     
                 index += 1
                 # median absolute deviation
@@ -887,4 +992,4 @@ if __name__ == '__main__':
 
     clf = RandomForestClassifier(random_state = 0, n_estimators = 1000).fit(X_train, y_train)
     y_test = clf.predict(X_test)
-    write_submission(y_test, 'submissions')
+    write_submission(y_test, 'submissions', submission_name='24_improved_feature_extraction_random_forest_v2.csv')

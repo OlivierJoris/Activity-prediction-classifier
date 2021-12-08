@@ -91,4 +91,4 @@ if __name__ == '__main__':
 
     y_test = clf.predict(X_test)
 
-    write_submission(y_test, 'submissions', submission_name='knn_basic_55.csv')
+    write_submission(y_test, 'submissions', submission_name='3_knn_basic_55.csv')

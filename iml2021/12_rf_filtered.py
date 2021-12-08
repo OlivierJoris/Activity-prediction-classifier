@@ -162,4 +162,4 @@ if __name__ == '__main__':
 
     print("Writing submission...")
 
-    write_submission(predictions, 'submissions', submission_name='forest_filtered.csv')
+    write_submission(predictions, 'submissions', submission_name='12_forest_filtered.csv')

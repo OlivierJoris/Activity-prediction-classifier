@@ -219,4 +219,4 @@ if __name__ == "__main__":
 
     # Writing CSV file
     print("Saving submission...")
-    write_submission(y_pred, 'submissions', submission_name='svc_60.csv')
+    write_submission(y_pred, 'submissions', submission_name='21_svc_60.csv')

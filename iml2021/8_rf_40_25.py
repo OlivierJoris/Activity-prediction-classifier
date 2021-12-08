@@ -129,4 +129,4 @@ if __name__ == '__main__':
     predictions = np.zeros(3500, dtype=int)
     predictions = forest.predict()
 
-    write_submission(predictions, 'submissions', submission_name='forest_40trees_25mss.csv')
+    write_submission(predictions, 'submissions', submission_name='8_forest_40trees_25mss.csv')

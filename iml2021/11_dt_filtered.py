@@ -157,4 +157,4 @@ if __name__ == '__main__':
     predictions = np.zeros(3500, dtype=int)
     predictions = tree.predict()
 
-    write_submission(predictions, 'submissions', submission_name='dt_filtered.csv')
+    write_submission(predictions, 'submissions', submission_name='11_dt_filtered.csv')

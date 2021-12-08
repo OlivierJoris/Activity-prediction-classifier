@@ -96,4 +96,4 @@ if __name__ == '__main__':
     clf.fit(X_train, y_train)
     y_test = clf.predict(X_test)
 
-    write_submission(y_test, 'submissions', submission_name="7-knn.csv")
+    write_submission(y_test, 'submissions', submission_name="7_knn.csv")

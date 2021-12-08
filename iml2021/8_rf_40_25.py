@@ -4,25 +4,27 @@
 
 import os
 import numpy as np
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 
-class KnnSplitted:
+class RandomForest:
     """
-    Classifier that uses one KNN per feature.
+    Classifier that uses a random forest.
     """
 
-    def __init__(self, n_neighbors):
+    def __init__(self, n_estimators,min_sample_split):
         """
         Argument:
         ---------
-        - `n_neighbors`: number of neighbors used in the KNN models.
+        - `n_estimators`: number of trees in the forest.
+        - `min_sample_split`: min_sample_split for the trees in the forest.
         """
-        self.n_neighbors = n_neighbors
+        self.n_estimators = n_estimators
+        self.min_sample_split = min_sample_split
     
     def load_data(self, data_path):
         """
         Load the data for the classifer.
-        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
         Argument:
         ---------
@@ -35,17 +37,16 @@ class KnnSplitted:
         # Create the training and testing samples
         LS_path = os.path.join(data_path, 'LS')
         TS_path = os.path.join(data_path, 'TS')
-        X_train = [np.zeros((N_TIME_SERIES, 512)) for i in range(2, 33)]
-        X_test = [np.zeros((N_TIME_SERIES, 512)) for i in range(2, 33)]
+        X_train = np.zeros((N_TIME_SERIES, (len(FEATURES) * 512)))
+        X_test = np.zeros((N_TIME_SERIES, (len(FEATURES) * 512)))
 
         for f in FEATURES:
             data = np.loadtxt(os.path.join(LS_path, 'LS_sensor_{}.txt'.format(f)))
-            X_train[f-2] = data
+            X_train[:, (f-2)*512:(f-2+1)*512] = data
             data = np.loadtxt(os.path.join(TS_path, 'TS_sensor_{}.txt'.format(f)))
-            X_test[f-2] = data
-
+            X_test[:, (f-2)*512:(f-2+1)*512] = data
+        
         y_train = np.loadtxt(os.path.join(LS_path, 'activity_Id.txt'))
-
         print('X_train len: {}.'.format(len(X_train)))
         print('y_train len: {}.'.format(len(y_train)))
         print('X_test len: {}.'.format(len(X_test)))
@@ -59,12 +60,8 @@ class KnnSplitted:
         Fit the classifier.
         """
 
-        self.models = []
-
-        for i in range(2, 33):
-            model = KNeighborsClassifier(n_neighbors=self.n_neighbors)
-            model.fit(self.X_train[i-2], self.y_train)
-            self.models.append(model)
+        self.model = RandomForestClassifier(n_estimators=self.n_estimators, min_samples_split=self.min_sample_split, n_jobs=-1)
+        self.model = self.model.fit(self.X_train, self.y_train)
 
     def predict(self):
         """
@@ -75,23 +72,15 @@ class KnnSplitted:
         Return the predictions as a numpy ndarray.
         """
 
-        predictions = np.zeros((31, 3500), dtype=int)
+        predictions = np.zeros(3500, dtype=int)
+        predictions = self.model.predict(self.X_test)
 
-        for i in range(2, 33):
-            pred = np.zeros(3500)
-            pred = self.models[i-2].predict(self.X_test[i-2])
-            predictions[i-2] = pred
-
-        predictedClasses = np.zeros(3500, dtype=int)
-        for i in range (3500):
-            predictedClasses[i] = np.argmax(np.bincount(predictions[:, i]))
-
-        return predictedClasses
+        return predictions
 
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -133,11 +122,11 @@ if __name__ == '__main__':
     # Directory containing the data folders
     DATA_PATH = 'data'
 
-    clf = KnnSplitted(n_neighbors=1)
-    clf.load_data(DATA_PATH)
-    clf.fit()
+    forest = RandomForest(n_estimators=40, min_sample_split=25)
+    forest.load_data(DATA_PATH)
+    forest.fit()
 
     predictions = np.zeros(3500, dtype=int)
-    predictions = clf.predict()
+    predictions = forest.predict()
 
-    write_submission(predictions, 'submissions', submission_name='knn_splitted_1.csv')
+    write_submission(predictions, 'submissions', submission_name='forest_40trees_25mss.csv')

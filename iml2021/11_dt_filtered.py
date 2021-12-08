@@ -25,7 +25,7 @@ class DTFiltered:
     def load_data(self, data_path):
         """
         Load the data for the classifer.
-        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
         Argument:
         ---------
@@ -105,7 +105,7 @@ class DTFiltered:
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------

@@ -8,7 +8,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 class KnnSplitted:
     """
-    Classifier that uses one KNN per feature with filtered data.
+    Classifier that uses one KNN per feature.
     """
 
     def __init__(self, n_neighbors):
@@ -22,7 +22,7 @@ class KnnSplitted:
     def load_data(self, data_path):
         """
         Load the data for the classifer.
-        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
         Argument:
         ---------
@@ -38,19 +38,11 @@ class KnnSplitted:
         X_train = [np.zeros((N_TIME_SERIES, 512)) for i in range(2, 33)]
         X_test = [np.zeros((N_TIME_SERIES, 512)) for i in range(2, 33)]
 
-        notCapture = np.full(512, -999999.99, dtype=float)
-        fullZeros = np.zeros(512)
-
         for f in FEATURES:
             data = np.loadtxt(os.path.join(LS_path, 'LS_sensor_{}.txt'.format(f)))
             X_train[f-2] = data
             data = np.loadtxt(os.path.join(TS_path, 'TS_sensor_{}.txt'.format(f)))
             X_test[f-2] = data
-        
-        for f in FEATURES:
-            for i in range(3500):
-                if np.array_equal(X_train[f-2][i], notCapture):
-                    X_train[f-2][i] = fullZeros
 
         y_train = np.loadtxt(os.path.join(LS_path, 'activity_Id.txt'))
 
@@ -99,7 +91,7 @@ class KnnSplitted:
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -142,13 +134,10 @@ if __name__ == '__main__':
     DATA_PATH = 'data'
 
     clf = KnnSplitted(n_neighbors=1)
-    print("Loading data ...")
     clf.load_data(DATA_PATH)
-    print("Fitting ...")
     clf.fit()
 
-    print("Predicting ...")
     predictions = np.zeros(3500, dtype=int)
     predictions = clf.predict()
 
-    write_submission(predictions, 'submissions', submission_name='knn_splitted_1_filtered.csv')
+    write_submission(predictions, 'submissions', submission_name='knn_splitted_1.csv')

@@ -4,27 +4,25 @@
 
 import os
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
 
-class RandomForest:
+class DecisionTree:
     """
-    Classifier that uses a random forest.
+    Classifier that uses a decision tree.
     """
 
-    def __init__(self, n_estimators,min_sample_split):
+    def __init__(self, min_sample_split):
         """
         Argument:
         ---------
-        - `n_estimators`: number of trees in the forest.
-        - `min_sample_split`: min_sample_split for the trees in the forest.
+        - `min_sample_split`: min_sample_split for the tree.
         """
-        self.n_estimators = n_estimators
         self.min_sample_split = min_sample_split
     
     def load_data(self, data_path):
         """
         Load the data for the classifer.
-        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+        Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
         Argument:
         ---------
@@ -60,7 +58,7 @@ class RandomForest:
         Fit the classifier.
         """
 
-        self.model = RandomForestClassifier(n_estimators=self.n_estimators, min_samples_split=self.min_sample_split, n_jobs=-1)
+        self.model = DecisionTreeClassifier(min_samples_leaf=self.min_sample_split)
         self.model = self.model.fit(self.X_train, self.y_train)
 
     def predict(self):
@@ -80,7 +78,7 @@ class RandomForest:
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -122,11 +120,11 @@ if __name__ == '__main__':
     # Directory containing the data folders
     DATA_PATH = 'data'
 
-    forest = RandomForest(n_estimators=40, min_sample_split=25)
-    forest.load_data(DATA_PATH)
-    forest.fit()
+    clf = DecisionTree(min_sample_split=2)
+    clf.load_data(DATA_PATH)
+    clf.fit()
 
     predictions = np.zeros(3500, dtype=int)
-    predictions = forest.predict()
+    predictions = clf.predict()
 
-    write_submission(predictions, 'submissions', submission_name='forest_40trees_25mss.csv')
+    write_submission(predictions, 'submissions', submission_name='dt_basic_2.csv')

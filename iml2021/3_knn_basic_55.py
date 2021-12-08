@@ -1,19 +1,17 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # Authors: Maxime Goffart and Olivier Joris
+# Based on Antonio Sutera & Yann Claes (toy_script.py)
 
 import os
 import numpy as np
 
-from sklearn.neural_network import MLPClassifier
-from sklearn.feature_selection import SelectFromModel
-from sklearn.impute import KNNImputer
-from sklearn.model_selection import cross_val_score
+from sklearn.neighbors import KNeighborsClassifier
 
 def load_data(data_path):
     """
     Load the data for the classifer.
-    Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Argument:
     ---------
@@ -42,9 +40,10 @@ def load_data(data_path):
 
     return X_train, y_train, X_test
 
+
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -82,32 +81,14 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
     print('Submission {} saved in {}.'.format(submission_name, SUBMISSION_PATH))
 
 if __name__ == '__main__':
+
     # Directory containing the data folders
     DATA_PATH = 'data'
     X_train, y_train, X_test = load_data(DATA_PATH)
 
-    # Replace missing values
-    imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
-    X_train = imputer.fit_transform(X_train)
-    
-    # Feature selection
-    print("Shape before feature selection: " + str(X_train.shape))
-
-    selector = SelectFromModel(estimator = etc).fit(X_train, y_train)
-    X_train = selector.transform(X_train)
-    X_test = selector.transform(X_test)
-
-    print("Shape after feature selection: " + str(X_train.shape))
-
-
-    clf = MLPClassifier(hidden_layer_sizes = (500,), random_state = 0)
-    scores = cross_val_score(clf, X_train, y_train, cv = 10, n_jobs = -1)
-    score = scores.mean()
-
-    print(score)
-
+    clf = KNeighborsClassifier(n_neighbors=55)
     clf.fit(X_train, y_train)
 
     y_test = clf.predict(X_test)
 
-    write_submission(y_test, 'submissions')
+    write_submission(y_test, 'submissions', submission_name='knn_basic_55.csv')

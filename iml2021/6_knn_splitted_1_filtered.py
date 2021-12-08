@@ -4,27 +4,25 @@
 
 import os
 import numpy as np
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.neighbors import KNeighborsClassifier
 
-class DecisionTreePruned:
+class KnnSplitted:
     """
-    Classifier that uses a pruned decision tree.
+    Classifier that uses one KNN per feature with filtered data.
     """
 
-    def __init__(self, min_sample_split, ccp_alpha):
+    def __init__(self, n_neighbors):
         """
         Argument:
         ---------
-        - `min_sample_split`: min_sample_split for the tree.
-        - `ccp_alpha`: value for prunning.
+        - `n_neighbors`: number of neighbors used in the KNN models.
         """
-        self.min_sample_split = min_sample_split
-        self.ccp_alpha = ccp_alpha
+        self.n_neighbors = n_neighbors
     
     def load_data(self, data_path):
         """
         Load the data for the classifer.
-        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
         Argument:
         ---------
@@ -37,16 +35,25 @@ class DecisionTreePruned:
         # Create the training and testing samples
         LS_path = os.path.join(data_path, 'LS')
         TS_path = os.path.join(data_path, 'TS')
-        X_train = np.zeros((N_TIME_SERIES, (len(FEATURES) * 512)))
-        X_test = np.zeros((N_TIME_SERIES, (len(FEATURES) * 512)))
+        X_train = [np.zeros((N_TIME_SERIES, 512)) for i in range(2, 33)]
+        X_test = [np.zeros((N_TIME_SERIES, 512)) for i in range(2, 33)]
+
+        notCapture = np.full(512, -999999.99, dtype=float)
+        fullZeros = np.zeros(512)
 
         for f in FEATURES:
             data = np.loadtxt(os.path.join(LS_path, 'LS_sensor_{}.txt'.format(f)))
-            X_train[:, (f-2)*512:(f-2+1)*512] = data
+            X_train[f-2] = data
             data = np.loadtxt(os.path.join(TS_path, 'TS_sensor_{}.txt'.format(f)))
-            X_test[:, (f-2)*512:(f-2+1)*512] = data
+            X_test[f-2] = data
         
+        for f in FEATURES:
+            for i in range(3500):
+                if np.array_equal(X_train[f-2][i], notCapture):
+                    X_train[f-2][i] = fullZeros
+
         y_train = np.loadtxt(os.path.join(LS_path, 'activity_Id.txt'))
+
         print('X_train len: {}.'.format(len(X_train)))
         print('y_train len: {}.'.format(len(y_train)))
         print('X_test len: {}.'.format(len(X_test)))
@@ -60,8 +67,12 @@ class DecisionTreePruned:
         Fit the classifier.
         """
 
-        self.model = DecisionTreeClassifier(min_samples_leaf=self.min_sample_split, ccp_alpha=self.ccp_alpha)
-        self.model = self.model.fit(self.X_train, self.y_train)
+        self.models = []
+
+        for i in range(2, 33):
+            model = KNeighborsClassifier(n_neighbors=self.n_neighbors)
+            model.fit(self.X_train[i-2], self.y_train)
+            self.models.append(model)
 
     def predict(self):
         """
@@ -72,15 +83,23 @@ class DecisionTreePruned:
         Return the predictions as a numpy ndarray.
         """
 
-        predictions = np.zeros(3500, dtype=int)
-        predictions = self.model.predict(self.X_test)
+        predictions = np.zeros((31, 3500), dtype=int)
 
-        return predictions
+        for i in range(2, 33):
+            pred = np.zeros(3500)
+            pred = self.models[i-2].predict(self.X_test[i-2])
+            predictions[i-2] = pred
+
+        predictedClasses = np.zeros(3500, dtype=int)
+        for i in range (3500):
+            predictedClasses[i] = np.argmax(np.bincount(predictions[:, i]))
+
+        return predictedClasses
 
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Arguments:
     ----------
@@ -122,11 +141,14 @@ if __name__ == '__main__':
     # Directory containing the data folders
     DATA_PATH = 'data'
 
-    clf = DecisionTreePruned(min_sample_split=2, ccp_alpha=0.0006772486772486773)
+    clf = KnnSplitted(n_neighbors=1)
+    print("Loading data ...")
     clf.load_data(DATA_PATH)
+    print("Fitting ...")
     clf.fit()
 
+    print("Predicting ...")
     predictions = np.zeros(3500, dtype=int)
     predictions = clf.predict()
 
-    write_submission(predictions, 'submissions', submission_name='dt_pruned.csv')
+    write_submission(predictions, 'submissions', submission_name='knn_splitted_1_filtered.csv')

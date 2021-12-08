@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# Author: Maxime Goffart and Olivier Joris
+# Authors: Maxime Goffart and Olivier Joris
 # SVM (sklearn.svm.SVC) with regularization (C) = 60.
 
 import os
@@ -12,8 +12,12 @@ from scipy.signal import find_peaks
 
 def load_data(data_path):
     """
-    Load the data.
-    Method given with the assignment. Author: Antonio Sutera & Yann Claess.
+    Load the data for the classifer.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+    Argument:
+    ---------
+    - `data_path`: Path to the data folder.
     """
 
     FEATURES = range(2, 33)
@@ -41,8 +45,13 @@ def load_data(data_path):
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Write predictions in csv file.
-    Method given with the assignment. Author: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+    Arguments:
+    ----------
+    - `y`: Predictions to write.
+    - `where`: Path to the file in which to write.
+    - `submission_name`: Name of the file.
     """
 
     os.makedirs(where, exist_ok=True)
@@ -87,6 +96,7 @@ def feature_extraction(X_train, X_test, data_path):
     -------
     Inputs of LS and TS after feature extraction.
     """
+
     FEATURES = range(2, 33)
     N_TIME_SERIES = 3500
     N_ATTRIBUTES = 16

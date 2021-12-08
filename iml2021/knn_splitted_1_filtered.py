@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# Author: Maxime Goffart and Olivier Joris
+# Authors: Maxime Goffart and Olivier Joris
 
 import os
 import numpy as np
@@ -8,7 +8,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 class KnnSplitted:
     """
-    Classifier that uses one KNN per feature.
+    Classifier that uses one KNN per feature with filtered data.
     """
 
     def __init__(self, n_neighbors):
@@ -22,7 +22,11 @@ class KnnSplitted:
     def load_data(self, data_path):
         """
         Load the data for the classifer.
-        Modified from the method given with the assignment.
+        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+        Argument:
+        ---------
+        - `data_path`: Path to the data folder.
         """
 
         FEATURES = range(2, 33)
@@ -73,6 +77,10 @@ class KnnSplitted:
     def predict(self):
         """
         Predict the class labels.
+
+        Return:
+        -------
+        Return the predictions as a numpy ndarray.
         """
 
         predictions = np.zeros((31, 3500), dtype=int)
@@ -90,6 +98,15 @@ class KnnSplitted:
 
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
+    """
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+    Arguments:
+    ----------
+    - `y`: Predictions to write.
+    - `where`: Path to the file in which to write.
+    - `submission_name`: Name of the file.
+    """
 
     os.makedirs(where, exist_ok=True)
 

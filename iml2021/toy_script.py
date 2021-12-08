@@ -6,7 +6,6 @@ import os
 import numpy as np
 
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.impute import SimpleImputer
 
 def load_data(data_path):
 

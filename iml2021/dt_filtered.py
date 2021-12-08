@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# Author: Maxime Goffart and Olivier Joris
+# Authors: Maxime Goffart and Olivier Joris
 
 import os
 import numpy as np
@@ -25,7 +25,11 @@ class DTFiltered:
     def load_data(self, data_path):
         """
         Load the data for the classifer.
-        Modified from the method given with the assignment.
+        Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+        Argument:
+        ---------
+        - `data_path`: Path to the data folder.
         """
 
         FEATURES = range(2, 33)
@@ -101,7 +105,13 @@ class DTFiltered:
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
-    Method given with the assignment.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+    Arguments:
+    ----------
+    - `y`: Predictions to write.
+    - `where`: Path to the file in which to write.
+    - `submission_name`: Name of the file.
     """
 
     os.makedirs(where, exist_ok=True)

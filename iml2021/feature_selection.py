@@ -1,18 +1,24 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+# Authors: Maxime Goffart and Olivier Joris
 
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.feature_selection import SelectFromModel
 from sklearn.impute import KNNImputer
-from sklearn.model_selection import cross_val_score
 
-# Author: Antonio Sutera & Yann Claess
 def load_data(data_path):
+    """
+    Load the data for the classifer.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+    Argument:
+    ---------
+    - `data_path`: Path to the data folder.
+    """
 
     FEATURES = range(2, 33)
     N_TIME_SERIES = 3500
@@ -41,6 +47,15 @@ def load_data(data_path):
 
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
+    """
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+
+    Arguments:
+    ----------
+    - `y`: Predictions to write.
+    - `where`: Path to the file in which to write.
+    - `submission_name`: Name of the file.
+    """
 
     os.makedirs(where, exist_ok=True)
 
@@ -72,6 +87,10 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
 
 
 def compute_proportion_subjects():
+    """
+    Compute the proportions of the subjects and the activities.
+    """
+
     LS = np.loadtxt(os.path.join('data/LS', 'subject_Id.txt'))
     activity = np.loadtxt(os.path.join('data/LS', 'activity_Id.txt'))
 

@@ -90,7 +90,7 @@ We also added these subject id's as feature.
 \subsection{Feature selection}
 \paragraph{}The fact that the dataset was really huge (3500 * 31 * 512 values) and some values irrelevant, motivated us to perform features selection. We decided to perform feature selection using \texttt{SelectFromModel}\footnote{\url{https://scikit-learn.org/stable/modules/feature_selection.html}}. It is performing ranking based on one estimator and then remove the less ranked features recursively. We chose the \texttt{ExtraTreeClassifier}\footnote{\url{https://www.geeksforgeeks.org/ml-extra-tree-classifier-for-feature-selection/}} as estimator for this method. It is similar to a random tree classifier and only differ in the manner it is constructed which lead to the creation of multiple de-correlated decision trees. This seems us to be a good model to rank the features because we have seen in the theoretical course that decision trees are nice to discriminate features but are too much related to the dataset. It is why the way the Extremely Randomized Trees are constructed reduce the variance link to the dataset and reduce the chance of overfitting.
 
-\paragraph{}The implementation of this part can be found in the \texttt{feature\_selection.ipynb} notebook or in the \texttt{feature\_selection.py} python script. 
+\paragraph{}The implementation of this part can be found in the \texttt{feature\_selection.py} python script. 
 
 \subsection{Feature extraction} \label{sec:feature_ex}
 \paragraph{}Because feature selection did not improve the scores of our model, we decided to extract new features from the one of the dataset including the subject id's which were not used in the initial dataset. First, we performed some statistics on the time series (mean, median, standard deviation, etc). 
@@ -100,7 +100,7 @@ We thought that a good model could understand the meaning of these statistics an
 \paragraph{}Thereafter, because we did not had signal representation knowledge, we a bit investigate\footnote{\url{https://towardsdatascience.com/feature-engineering-on-time-series-data-transforming-signal-data-of-a-smartphone-accelerometer-for-72cbe34b8a60}} about the features we could add to feed our model and found that these statistics could also be expressed in a frequency domain instead of time domain: this is easy to do thanks to the discrete Fourier transform which is integrated in the numpy library.
 We also extracted some purely physics features: the energy of one signal, the average resultant acceleration, and the signal magnitude area. We also tried some libraries\footnote{Like \texttt{sktime} and \texttt{tsfresh}.} which have this feature extraction as purpose but it was very slow and we thus quickly forgave them.
 
-\paragraph{}Our different attempt of implementation can be found in the \texttt{feature\_extraction\_v*.ipynb} notebook or in the \texttt{feature\_extraction\_v*.py} Python script where * refer to the version of this feature extraction.
+\paragraph{}Our different attempt of implementation can be found in the \texttt{feature\_extraction\_v*.py} Python script where * refer to the version of this feature extraction.
 
 \section{Performance measure}
 We initially performed cross-validation inside our training set splitting it blindly. This lead us to high score but when posting our predictions on Kaggle, the score inordinately decreased. Some results we present in the section \ref{sec:models} are based on this technique because we only, late in the project, realized that another method could be used to have more realistic scores.

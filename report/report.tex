@@ -262,7 +262,7 @@ This model is implemented in the file \texttt{rf\_filtered.py}. This particular 
 
 \paragraph{}The way the features were generated is well appropriate to trees. They can, for example, split according to the feature which represents the variance of the timesteps. The tree can divide the ones having a null variance from the others which represents splitting static activities from dynamic ones. It is why we chose this model as final model. We have less chance to overfit because we understand our model unlike models which can become too complex to understand. It also performs the best score when doing cross-validation splitting according to the subject ID's which motivated this choice.
 
-\paragraph{}The implementation of this model is available in the \texttt{random\_forest\_feature\_extraction.py} python script.
+\paragraph{}The implementation of this model is available in the \texttt{26\_random\_forest\_feature\_extraction.py} python script.
 
 \subsubsection{Conclusion on random forests}
 \paragraph{}Random forests which is an ensemble method using "bagged" trees fill the trend of the trees to overfit and is thus well adapted to our feature extraction. As observable in the table of section \ref{sec:summary}, random forest is the model that provides the highest accuracy locally and on Kaggle. 

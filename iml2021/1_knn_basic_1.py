@@ -1,14 +1,11 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-# Authors: Maxime Goffart and Olivier Joris
+# Authors: Antonio Sutera & Yann Claes (toy_script.py)
 
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.feature_selection import SelectFromModel
-from sklearn.impute import KNNImputer
+from sklearn.neighbors import KNeighborsClassifier
 
 def load_data(data_path):
     """
@@ -23,15 +20,12 @@ def load_data(data_path):
     FEATURES = range(2, 33)
     N_TIME_SERIES = 3500
 
-    print("Loading data...")
-
     # Create the training and testing samples
     LS_path = os.path.join(data_path, 'LS')
     TS_path = os.path.join(data_path, 'TS')
     X_train, X_test = [np.zeros((N_TIME_SERIES, (len(FEATURES) * 512))) for i in range(2)]
 
     for f in FEATURES:
-        print("Loading feature {}...".format(f))
         data = np.loadtxt(os.path.join(LS_path, 'LS_sensor_{}.txt'.format(f)))
         X_train[:, (f-2)*512:(f-2+1)*512] = data
         data = np.loadtxt(os.path.join(TS_path, 'TS_sensor_{}.txt'.format(f)))
@@ -44,7 +38,6 @@ def load_data(data_path):
     print('X_test size: {}.'.format(X_test.shape))
 
     return X_train, y_train, X_test
-
 
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
@@ -85,53 +78,15 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
 
     print('Submission {} saved in {}.'.format(submission_name, SUBMISSION_PATH))
 
-
-def compute_proportion_subjects():
-    """
-    Compute the proportions of the subjects and the activities.
-    """
-
-    LS = np.loadtxt(os.path.join('data/LS', 'subject_Id.txt'))
-    activity = np.loadtxt(os.path.join('data/LS', 'activity_Id.txt'))
-
-    unique_activity, count_activity = np.unique(activity, return_counts = True)
-    unique_ls, count_ls = np.unique(LS, return_counts = True)
-    
-    plt.bar(unique_activity, count_activity, width=0.5, bottom=None, align='center', data=None)
-    plt.title("Repartition of the activties in the learning set")
-    plt.xlabel("activity id")
-    plt.ylabel("number of instances")
-    plt.show()
-    
-    plt.bar(unique_ls, count_ls, width=0.5, bottom=None, align='center', data=None)
-    plt.title("Repartition of the subject id in the learning set")
-    plt.xlabel("subject id")
-    plt.ylabel("number of instances")
-    plt.show()
-
 if __name__ == '__main__':
-    # Compute proportion of subjects
-    #compute_proportion_subjects()
 
     # Directory containing the data folders
     DATA_PATH = 'data'
     X_train, y_train, X_test = load_data(DATA_PATH)
 
-    # Replace missing values
-    print("Missing values...")
-    imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
-    X_train = imputer.fit_transform(X_train)
+    clf = KNeighborsClassifier(n_neighbors=1)
+    clf.fit(X_train, y_train)
 
-    # Features selection
-    etc = ExtraTreesClassifier(n_estimators = 1000, random_state = 0)
-    
-    print("Shape before feature selection: " + str(X_train.shape))
-    
-    print("SelectFromModel...")
-    selector = SelectFromModel(estimator = etc).fit(X_train, y_train)
-    print("Transform X_train...")
-    X_train = selector.transform(X_train)
-    print("Transform X_test...")
-    X_test = selector.transform(X_test)
-    
-    print("Shape after feature selection: " + str(X_train.shape))
+    y_test = clf.predict(X_test)
+
+    write_submission(y_test, 'submissions', submission_name='1_knn_basic_1.csv')

@@ -1,42 +1,22 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
+# Authors: Maxime Goffart and Olivier Joris
 
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-import entropy as ent
 import random
 
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.feature_selection import SelectFromModel
 from sklearn.impute import KNNImputer
-from sklearn.model_selection import cross_val_score
 from scipy import stats
 from scipy.signal import find_peaks
 from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import ShuffleSplit
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score
-from sklearn.linear_model import LogisticRegression, SGDClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.ensemble import StackingClassifier
-from sklearn.pipeline import make_pipeline
-from sklearn.ensemble import VotingClassifier
 
 def load_data(data_path):
     """
     Load the data for the classifer.
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Argument:
     ---------
@@ -68,7 +48,7 @@ def load_data(data_path):
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
     Load the data for the classifer.
-    Method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Argument:
     ---------
@@ -102,10 +82,6 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
             file.write('{},{}\n'.format(n+1, int(i)))
 
     print('Submission {} saved in {}.'.format(submission_name, SUBMISSION_PATH))
-
-
-# In[2]:
-
 
 def feature_extraction(X_train, X_test, data_path):
     """
@@ -954,164 +930,138 @@ def feature_extraction(X_train, X_test, data_path):
     return new_X_train, new_X_test
 
 
-# In[3]:
-
-
 if __name__ == '__main__':
     # Directory containing the data folders
     DATA_PATH = 'data'
     init_X_train, y_train, init_X_test = load_data(DATA_PATH)
 
+    # Replace missing values
+    imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
+    init_X_train = imputer.fit_transform(init_X_train)
 
-# In[4]:
+    # Feature extraction
+    X_train, X_test = feature_extraction(init_X_train, init_X_test, DATA_PATH)
 
+    LS_path = os.path.join(DATA_PATH, 'LS')   
+    LS_subject_id = np.loadtxt(os.path.join(LS_path, 'subject_Id.txt'))
 
-# Replace missing values
-imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
-init_X_train = imputer.fit_transform(init_X_train)
+    iter_nb = 5
 
+    ids = [1, 2, 3, 4, 5]
+    learning_id = [0, 0, 0]   
+    scores = np.zeros(iter_nb)
 
-# In[5]:
+    random.seed()
 
+    learning_id = [0,0,0]
 
-# Feature extraction
-X_train, X_test = feature_extraction(init_X_train, init_X_test, DATA_PATH)
+    gen_score = []
+    number_neurons = []
 
+    for x in range(50, 250, 50):
+        for j in range(iter_nb):
+            random.shuffle(ids)
 
-# In[6]:
+            for i in range(3):
+                learning_id[i] = ids[i]
 
+            unique_ls, count_ls = np.unique(LS_subject_id, return_counts = True)
 
-LS_path = os.path.join(DATA_PATH, 'LS')   
-LS_subject_id = np.loadtxt(os.path.join(LS_path, 'subject_Id.txt'))
+            count = np.asarray((unique_ls, count_ls))
 
-iter_nb = 5
+            training_size = int(count[1][learning_id[0] - 1] + count[1][learning_id[1] - 1] + count[1][learning_id[2] - 1])
 
-ids = [1, 2, 3, 4, 5]
-learning_id = [0, 0, 0]   
-scores = np.zeros(iter_nb)
+            X_train_split = np.zeros((training_size, X_train.shape[1]))
+            X_test_split = np.zeros((3500 - training_size, X_test.shape[1]))
 
-random.seed()
+            y_train_split = np.zeros((training_size))
+            y_test_split = np.zeros((3500 - training_size))
 
-learning_id = [0,0,0]
+            training_current_size, testing_current_size = 0, 0
 
-gen_score = []
-number_neurons = []
+            for i in range(3500):
+                if LS_subject_id[i] in learning_id:
+                    X_train_split[training_current_size] = X_train[i]
+                    y_train_split[training_current_size] = y_train[i]
+                    training_current_size += 1
+                else:
+                    X_test_split[testing_current_size] = X_train[i]
+                    y_test_split[testing_current_size] = y_train[i]
+                    testing_current_size += 1
 
-for x in range(50, 250, 50):
-    for j in range(iter_nb):
-        random.shuffle(ids)
+            rf = MLPClassifier(random_state = 0, hidden_layer_sizes = (x,)).fit(X_train_split, y_train_split)
+            y_pred = rf.predict(X_test_split)
+            scores[j] = accuracy_score(y_test_split, y_pred)
 
-        for i in range(3):
-            learning_id[i] = ids[i]
+        gen_score.append(np.mean(scores))
+        number_neurons.append(x)
+            
+    plt.plot(number_neurons, gen_score)
+    plt.xlabel("Number of neurons")
+    plt.ylabel("Accuracy")
+    plt.title("Mean accuracies of MLP with feature extraction according to the number of neurons.")
+    plt.savefig('MLP_feature_extraction_neurons.png')
+    plt.show()
 
-        unique_ls, count_ls = np.unique(LS_subject_id, return_counts = True)
+    LS_path = os.path.join(DATA_PATH, 'LS')   
+    LS_subject_id = np.loadtxt(os.path.join(LS_path, 'subject_Id.txt'))
 
-        count = np.asarray((unique_ls, count_ls))
+    iter_nb = 5
 
-        training_size = int(count[1][learning_id[0] - 1] + count[1][learning_id[1] - 1] + count[1][learning_id[2] - 1])
+    ids = [1, 2, 3, 4, 5]
+    learning_id = [0, 0, 0]   
+    scores = np.zeros(iter_nb)
 
-        X_train_split = np.zeros((training_size, X_train.shape[1]))
-        X_test_split = np.zeros((3500 - training_size, X_test.shape[1]))
+    random.seed()
 
-        y_train_split = np.zeros((training_size))
-        y_test_split = np.zeros((3500 - training_size))
+    learning_id = [0,0,0]
 
-        training_current_size, testing_current_size = 0, 0
+    gen_score = []
+    number_layers = []
+    layers = [50]
 
-        for i in range(3500):
-            if LS_subject_id[i] in learning_id:
-                X_train_split[training_current_size] = X_train[i]
-                y_train_split[training_current_size] = y_train[i]
-                training_current_size += 1
-            else:
-                X_test_split[testing_current_size] = X_train[i]
-                y_test_split[testing_current_size] = y_train[i]
-                testing_current_size += 1
+    for x in range(6):
+        for j in range(iter_nb):
+            random.shuffle(ids)
 
-        rf = MLPClassifier(random_state = 0, hidden_layer_sizes = (x,)).fit(X_train_split, y_train_split)
-        y_pred = rf.predict(X_test_split)
-        scores[j] = accuracy_score(y_test_split, y_pred)
+            for i in range(3):
+                learning_id[i] = ids[i]
 
-    gen_score.append(np.mean(scores))
-    number_neurons.append(x)
-          
-plt.plot(number_neurons, gen_score)
-plt.xlabel("Number of neurons")
-plt.ylabel("Accuracy")
-plt.title("Mean accuracies of MLP with feature extraction according to the number of neurons.")
-plt.savefig('MLP_feature_extraction_neurons.png')
-plt.show()
+            unique_ls, count_ls = np.unique(LS_subject_id, return_counts = True)
 
+            count = np.asarray((unique_ls, count_ls))
 
-# In[7]:
+            training_size = int(count[1][learning_id[0] - 1] + count[1][learning_id[1] - 1] + count[1][learning_id[2] - 1])
 
+            X_train_split = np.zeros((training_size, X_train.shape[1]))
+            X_test_split = np.zeros((3500 - training_size, X_test.shape[1]))
 
-LS_path = os.path.join(DATA_PATH, 'LS')   
-LS_subject_id = np.loadtxt(os.path.join(LS_path, 'subject_Id.txt'))
+            y_train_split = np.zeros((training_size))
+            y_test_split = np.zeros((3500 - training_size))
 
-iter_nb = 5
+            training_current_size, testing_current_size = 0, 0
 
-ids = [1, 2, 3, 4, 5]
-learning_id = [0, 0, 0]   
-scores = np.zeros(iter_nb)
+            for i in range(3500):
+                if LS_subject_id[i] in learning_id:
+                    X_train_split[training_current_size] = X_train[i]
+                    y_train_split[training_current_size] = y_train[i]
+                    training_current_size += 1
+                else:
+                    X_test_split[testing_current_size] = X_train[i]
+                    y_test_split[testing_current_size] = y_train[i]
+                    testing_current_size += 1
 
-random.seed()
+            rf = MLPClassifier(random_state = 0, hidden_layer_sizes = layers).fit(X_train_split, y_train_split)
+            y_pred = rf.predict(X_test_split)
+            scores[j] = accuracy_score(y_test_split, y_pred)
 
-learning_id = [0,0,0]
-
-gen_score = []
-number_layers = []
-layers = [50]
-
-for x in range(6):
-    for j in range(iter_nb):
-        random.shuffle(ids)
-
-        for i in range(3):
-            learning_id[i] = ids[i]
-
-        unique_ls, count_ls = np.unique(LS_subject_id, return_counts = True)
-
-        count = np.asarray((unique_ls, count_ls))
-
-        training_size = int(count[1][learning_id[0] - 1] + count[1][learning_id[1] - 1] + count[1][learning_id[2] - 1])
-
-        X_train_split = np.zeros((training_size, X_train.shape[1]))
-        X_test_split = np.zeros((3500 - training_size, X_test.shape[1]))
-
-        y_train_split = np.zeros((training_size))
-        y_test_split = np.zeros((3500 - training_size))
-
-        training_current_size, testing_current_size = 0, 0
-
-        for i in range(3500):
-            if LS_subject_id[i] in learning_id:
-                X_train_split[training_current_size] = X_train[i]
-                y_train_split[training_current_size] = y_train[i]
-                training_current_size += 1
-            else:
-                X_test_split[testing_current_size] = X_train[i]
-                y_test_split[testing_current_size] = y_train[i]
-                testing_current_size += 1
-
-        rf = MLPClassifier(random_state = 0, hidden_layer_sizes = layers).fit(X_train_split, y_train_split)
-        y_pred = rf.predict(X_test_split)
-        scores[j] = accuracy_score(y_test_split, y_pred)
-
-    gen_score.append(np.mean(scores))
-    number_layers.append(x)
-    layers.append(50)
-          
-plt.plot(number_layers, gen_score)
-plt.xlabel("Number of layers")
-plt.ylabel("Accuracy")
-plt.title("Mean accuracies of MLP with feature extraction according to the number of layers.")
-plt.savefig('MLP_feature_extraction_layers.png')
-plt.show()
-
-
-# In[ ]:
-
-
-
-
+        gen_score.append(np.mean(scores))
+        number_layers.append(x)
+        layers.append(50)
+            
+    plt.plot(number_layers, gen_score)
+    plt.xlabel("Number of layers")
+    plt.ylabel("Accuracy")
+    plt.title("Mean accuracies of MLP with feature extraction according to the number of layers.")
+    plt.savefig('MLP_feature_extraction_layers.png')
+    plt.show()

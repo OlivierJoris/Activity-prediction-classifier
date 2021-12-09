@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[7]:
-
-
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # Authors: Maxime Goffart and Olivier Joris
@@ -22,7 +16,7 @@ from sklearn.metrics import accuracy_score
 def load_data(data_path):
     """
     Load the data for the classifer.
-    Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Argument:
     ---------
@@ -54,7 +48,7 @@ def load_data(data_path):
 def write_submission(y, where, submission_name='toy_submission.csv'):
     """
     Load the data for the classifer.
-    Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claess.
+    Modified from the method given with the assignment. Authors: Antonio Sutera & Yann Claes.
 
     Argument:
     ---------
@@ -88,10 +82,6 @@ def write_submission(y, where, submission_name='toy_submission.csv'):
             file.write('{},{}\n'.format(n+1, int(i)))
 
     print('Submission {} saved in {}.'.format(submission_name, SUBMISSION_PATH))
-
-
-# In[2]:
-
 
 def feature_extraction(X_train, X_test, data_path):
     """
@@ -939,106 +929,79 @@ def feature_extraction(X_train, X_test, data_path):
                     
     return new_X_train, new_X_test
 
-
-# In[3]:
-
-
 if __name__ == '__main__':
     # Directory containing the data folders
     DATA_PATH = 'data'
     init_X_train, y_train, init_X_test = load_data(DATA_PATH)
 
+    # Replace missing values
+    imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
+    init_X_train = imputer.fit_transform(init_X_train)
 
-# In[4]:
+    # Feature extraction
+    X_train, X_test = feature_extraction(init_X_train, init_X_test, DATA_PATH)
 
+    LS_path = os.path.join(DATA_PATH, 'LS')   
+    LS_subject_id = np.loadtxt(os.path.join(LS_path, 'subject_Id.txt'))
 
-# Replace missing values
-imputer = KNNImputer(n_neighbors = 5, weights = 'distance', missing_values = -999999.99)
-init_X_train = imputer.fit_transform(init_X_train)
+    iter_nb = 5
 
+    ids = [1, 2, 3, 4, 5]
+    learning_id = [0, 0, 0]   
+    scores = np.zeros(iter_nb)
 
-# In[5]:
+    random.seed()
 
+    learning_id = [0,0,0]
 
-# Feature extraction
-X_train, X_test = feature_extraction(init_X_train, init_X_test, DATA_PATH)
+    gen_score = []
+    number_trees = []
 
+    for x in range(100, 1000, 100):
+        for j in range(iter_nb):
+            random.shuffle(ids)
 
-# In[14]:
+            for i in range(3):
+                learning_id[i] = ids[i]
 
+            unique_ls, count_ls = np.unique(LS_subject_id, return_counts = True)
 
-LS_path = os.path.join(DATA_PATH, 'LS')   
-LS_subject_id = np.loadtxt(os.path.join(LS_path, 'subject_Id.txt'))
+            count = np.asarray((unique_ls, count_ls))
 
-iter_nb = 5
+            training_size = int(count[1][learning_id[0] - 1] + count[1][learning_id[1] - 1] + count[1][learning_id[2] - 1])
 
-ids = [1, 2, 3, 4, 5]
-learning_id = [0, 0, 0]   
-scores = np.zeros(iter_nb)
+            X_train_split = np.zeros((training_size, X_train.shape[1]))
+            X_test_split = np.zeros((3500 - training_size, X_test.shape[1]))
 
-random.seed()
+            y_train_split = np.zeros((training_size))
+            y_test_split = np.zeros((3500 - training_size))
 
-learning_id = [0,0,0]
+            training_current_size, testing_current_size = 0, 0
 
-gen_score = []
-number_trees = []
+            for i in range(3500):
+                if LS_subject_id[i] in learning_id:
+                    X_train_split[training_current_size] = X_train[i]
+                    y_train_split[training_current_size] = y_train[i]
+                    training_current_size += 1
+                else:
+                    X_test_split[testing_current_size] = X_train[i]
+                    y_test_split[testing_current_size] = y_train[i]
+                    testing_current_size += 1
 
-for x in range(100, 1000, 100):
-    for j in range(iter_nb):
-        random.shuffle(ids)
+            rf = RandomForestClassifier(random_state = 0, n_estimators = x).fit(X_train_split, y_train_split)
+            y_pred = rf.predict(X_test_split)
+            scores[j] = accuracy_score(y_test_split, y_pred)
 
-        for i in range(3):
-            learning_id[i] = ids[i]
+        gen_score.append(np.mean(scores))
+        number_trees.append(x)
+            
+    plt.plot(number_trees, gen_score)
+    plt.xlabel("Number of forest")
+    plt.ylabel("Accuracy")
+    plt.title("Mean accuracies of random forest with feature extraction according to the number of forests.")
+    plt.savefig('random_forest_feature_extraction.png')
+    plt.show()
 
-        unique_ls, count_ls = np.unique(LS_subject_id, return_counts = True)
-
-        count = np.asarray((unique_ls, count_ls))
-
-        training_size = int(count[1][learning_id[0] - 1] + count[1][learning_id[1] - 1] + count[1][learning_id[2] - 1])
-
-        X_train_split = np.zeros((training_size, X_train.shape[1]))
-        X_test_split = np.zeros((3500 - training_size, X_test.shape[1]))
-
-        y_train_split = np.zeros((training_size))
-        y_test_split = np.zeros((3500 - training_size))
-
-        training_current_size, testing_current_size = 0, 0
-
-        for i in range(3500):
-            if LS_subject_id[i] in learning_id:
-                X_train_split[training_current_size] = X_train[i]
-                y_train_split[training_current_size] = y_train[i]
-                training_current_size += 1
-            else:
-                X_test_split[testing_current_size] = X_train[i]
-                y_test_split[testing_current_size] = y_train[i]
-                testing_current_size += 1
-
-        rf = RandomForestClassifier(random_state = 0, n_estimators = x).fit(X_train_split, y_train_split)
-        y_pred = rf.predict(X_test_split)
-        scores[j] = accuracy_score(y_test_split, y_pred)
-
-    gen_score.append(np.mean(scores))
-    number_trees.append(x)
-          
-plt.plot(number_trees, gen_score)
-plt.xlabel("Number of forest")
-plt.ylabel("Accuracy")
-plt.title("Mean accuracies of random forest with feature extraction according to the number of forests.")
-plt.savefig('random_forest_feature_extraction.png')
-plt.show()
-
-
-# In[15]:
-
-
-clf = RandomForestClassifier(random_state = 0, n_estimators = 400).fit(X_train, y_train)
-y_test = clf.predict(X_test)
-write_submission(y_test, 'submissions')
-
-
-# In[ ]:
-
-
-
-
+    clf = RandomForestClassifier(random_state = 0, n_estimators = 400).fit(X_train, y_train)
+    y_test = clf.predict(X_test)
+    write_submission(y_test, 'submissions', submission_name='26_random_forest_400.csv')

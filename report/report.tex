@@ -68,8 +68,8 @@ to have good results when doing classification. This section includes the observ
 and different approaches we tried in order to solve the problems linked to the dataset.
 
 \subsection{Filling missing values}
-\paragraph{}The learning set contained a certain number of missing values represented by the \texttt{-999999.99} value. We thus started by looking at several 
-methods proposed by the scikit-learn library\footnote{\url{https://scikit-learn.org/stable/modules/impute.html}} to replace these missing values. We tried several of these methods and finally decided to use the \texttt{KNNImputer} which completes missing values using k-nearest neighbors : each missing value is imputed using the mean value from the nearest neighbors found in the training set. 
+\paragraph{}The learning set contained a certain number of missing values represented by the \texttt{-999999.99} value. Thus, we started by looking at several 
+methods proposed by the scikit-learn library\footnote{\url{https://scikit-learn.org/stable/modules/impute.html}} to replace these missing values. We tried several of these methods and finally decided to use the \texttt{KNNImputer} which completes missing values using k-nearest neighbors. Each missing value is imputed using the mean value from the nearest neighbors found in the training set. 
 
 \subsection{Observations about the samples} \label{sec:obs}
 
@@ -80,31 +80,34 @@ methods proposed by the scikit-learn library\footnote{\url{https://scikit-learn.
 \label{subject_repartition}
 \end{figure}
 
-\paragraph{}We observed that the learning set seems to be balanced. The activity ID's are well distributed: they are each composed of 250 instances of the subjects in the training set. It is good because if this was imbalanced we could have a model which always predict the value of the majority class. This model would have a nice score in our learning set but when trying it on the testing set, it would lead to bad results. 
+\paragraph{}We observed that the learning set seems to be balanced. The activity ID's are well distributed. They are each composed of 250 instances of the subjects in the training set. It is good because if this was imbalanced we could have a model which always predict the value of the majority class. This model would have a nice score on our learning set but when trying it on the testing set, it would lead to bad results. 
 
-\paragraph{}However, when looking at the subject ID's of the learning set, we observed that some subjects have been less used to perform measures. This can be observed on the figure \ref{subject_repartition}.
-This can lead to overfit: all subjects have not the same behavior when perfoming an activity and the sensors measures are correlated to one subject. We tried to make the sample relative to sensors and did feature selection on them to handle this problem. It was then difficult to predict the activity of the input subjects because the samples were not anymore link to one subject. We thus, later in the project, realized that when doing cross-validation to measure the accuracy of our models, we had to split our training and testing sets according to the subject id in order to see if it can predict the activity of unseen subjects before.
-We also added these subject id's as feature.
+\paragraph{}However, when looking at the subject ID's of the learning set, we observed that some subjects have been less used to perform measurements. This can be observed on the figure \ref{subject_repartition}.
+This can lead to overfit because all subjects have not the same behavior when perfoming an activity and the sensors measurements are correlated to one subject. We tried to make the sample relative to sensors and did feature selection on them to handle this problem. It was then difficult to predict the activity of the input subjects because the samples were not anymore linked to one subject. We thus, later in the project, realized that when doing cross-validation to measure the accuracy of our models, we had to split our training and testing sets according to the subject ids in order to see if it can predict the activity of unseen subjects.
+We also added these subject ids as feature.
 
 
 \subsection{Feature selection}
-\paragraph{}The fact that the dataset was really huge (3500 * 31 * 512 values) and some values irrelevant, motivated us to perform features selection. We decided to perform feature selection using \texttt{SelectFromModel}\footnote{\url{https://scikit-learn.org/stable/modules/feature_selection.html}}. It is performing ranking based on one estimator and then remove the less ranked features recursively. We chose the \texttt{ExtraTreeClassifier}\footnote{\url{https://www.geeksforgeeks.org/ml-extra-tree-classifier-for-feature-selection/}} as estimator for this method. It is similar to a random tree classifier and only differ in the manner it is constructed which lead to the creation of multiple de-correlated decision trees. This seems us to be a good model to rank the features because we have seen in the theoretical course that decision trees are nice to discriminate features but are too much related to the dataset. It is why the way the Extremely Randomized Trees are constructed reduce the variance link to the dataset and reduce the chance of overfitting.
+\paragraph{}The fact that the dataset was really huge (3500 * 31 * 512 values) and some values irrelevant, motivated us to perform features selection. We decided to perform feature selection using \texttt{SelectFromModel}\footnote{\url{https://scikit-learn.org/stable/modules/feature_selection.html}}. It is performing ranking based on one estimator and then remove the less ranked features recursively. We chose the \texttt{ExtraTreeClassifier}\footnote{\url{https://www.geeksforgeeks.org/ml-extra-tree-classifier-for-feature-selection/}} as estimator for this method. It is similar to a random tree classifier and only differ in the manner it is constructed which lead to the creation of multiple de-correlated decision trees. This seems to be a good model to rank the features because we have seen in the theoretical course that decision trees are nice to discriminate features but are too much related to the dataset. This is why the way the Extremely Randomized Trees are constructed reduce the variance of the dataset and reduce the chance of overfitting.
 
 \paragraph{}The implementation of this part can be found in the \texttt{feature\_selection.py} python script. 
 
 \subsection{Feature extraction} \label{sec:feature_ex}
-\paragraph{}Because feature selection did not improve the scores of our model, we decided to extract new features from the one of the dataset including the subject id's which were not used in the initial dataset. First, we performed some statistics on the time series (mean, median, standard deviation, etc). 
-We had the idea to perform these extractions because it could reduce the number of features and keep the meaning of the data: a null variance implies that the activity is a static activity, the number of negative values implies that it is an activity in a cold environment, etc.
-We thought that a good model could understand the meaning of these statistics and it makes improve our score. 
+\paragraph{}Because feature selection did not improve the scores of our model, we decided to extract new features from the ones of the dataset including the subject ids which were not used in the initial dataset. First, we performed some statistics on the time series (mean, median, standard deviation, etc). 
+We had the idea to perform these extractions because it could reduce the number of features and keep the meaning of the data. A null variance implies that the activity is a static activity, the number of negative values implies that it is an activity in a cold environment, etc.
+We thought that a good model could understand the meaning of these statistics and it improves our score. 
 
-\paragraph{}Thereafter, because we did not had signal representation knowledge, we a bit investigate\footnote{\url{https://towardsdatascience.com/feature-engineering-on-time-series-data-transforming-signal-data-of-a-smartphone-accelerometer-for-72cbe34b8a60}} about the features we could add to feed our model and found that these statistics could also be expressed in a frequency domain instead of time domain: this is easy to do thanks to the discrete Fourier transform which is integrated in the numpy library.
-We also extracted some purely physics features: the energy of one signal, the average resultant acceleration, and the signal magnitude area. We also tried some libraries\footnote{Like \texttt{sktime} and \texttt{tsfresh}.} which have this feature extraction as purpose but it was very slow and we thus quickly forgave them.
+\paragraph{}Thereafter, because we did not had signal representation knowledge, we investigate\footnote{\url{https://towardsdatascience.com/feature-engineering-on-time-series-data-transforming-signal-data-of-a-smartphone-accelerometer-for-72cbe34b8a60}} about the features we could add to feed our model and found that these statistics could also be expressed in a frequency domain instead of time domain. This is easy to do thanks to the discrete Fourier transforms which are integrated in the numpy library.
+We also extracted some purely physics features such as the energy of one signal, the average resultant acceleration, and the signal magnitude area. We also tried some libraries\footnote{Like \texttt{sktime} and \texttt{tsfresh}.} which have this feature extraction as purpose but it was very slow and we thus quickly forgave them.
 
-\paragraph{}Our different attempt of implementation can be found in the \texttt{feature\_extraction\_v*.py} Python script where * refer to the version of this feature extraction.
+\paragraph{}Our different attempts of implementation can be found in the \texttt{feature\_extraction\_v*.py} Python script where * refer to the version of this feature extraction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Performance measure}
-We initially performed cross-validation inside our training set splitting it blindly. This lead us to high score but when posting our predictions on Kaggle, the score inordinately decreased. Some results we present in the section \ref{sec:models} are based on this technique because we only, late in the project, realized that another method could be used to have more realistic scores.
-As introduced in the section \ref{sec:obs}, this method consists in doing cross-validation but taking into account the subject ids. We decided to at each iteration of our k-cross-validation split our training set randomly: the splitted training set is composed of three of the subject ids samples and the splitted testing set of the two remaining. This method is better to approximate prediction on the real testing set because this set is composed of never seen subjects.
+We initially performed cross-validation inside our training set splitting it blindly. This lead us to high scores but when posting our predictions on Kaggle, the score inordinately decreased. Some results we present in the section \ref{sec:models} are based on this technique because we only, late in the project, realized that another method could be used to have more realistic scores.
+As introduced in the section \ref{sec:obs}, this method consists in doing cross-validation but taking into account the subject ids. We decided, at each iteration of our k-cross-validation, to split our training set randomly such the split training set is composed of three of the subject ids samples and the split testing set of the two remaining. This method is better to approximate predictions on the real testing set because this set is composed of never seen subjects.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Studied models} \label{sec:models}
@@ -151,7 +154,7 @@ We implemented this approach in the file \texttt{knn\_splitted\_1.py}. This yiel
 We implemented this approach in the file \texttt{knn\_splitted\_1\_filtered.py} and the score obtained on Kaggle was 0.53142.
 
 \subsubsection{Conclusion on K-nearest neighbors}
-\paragraph{}After all the different tries perform using K-nearest neighbors models, we came to the conclusion that "vanilla" K-NN were not sufficient for this project.\\
+\paragraph{}After all the different tries perform using K-nearest neighbors models, we came to the conclusion that K-NN was not sufficient for this project.\\
 The codes for the different plots are available inside the Jupyter notebooks \texttt{knn\_basic.ipynb} and \texttt{knn\_splitted.ipynb}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -185,7 +188,7 @@ We continue this approach and study the accuracy of the model for values of the 
 \end{tabular}
 \end{table}
 It turns out that using that using a small value for the parameter \texttt{min\_sample\_split} provides a higher accuracy using a 10-fold cross validation strategy. Yet, we might overfit on unseen data. Thus, we decided to study the overfitting. We based ourselves on the approach presented in the documentation of scikit-learn\footnote{https://scikit-learn.org/stable/auto\_examples/tree/plot\_cost\_complexity\_pruning.html\#}.
-\paragraph{}We split the learning sample in 2 using proportions 75\% and 25\% where the 75\% will be our new learning set and the 25\% will be our new test set. Then, we computed the path during the minimal cost-complexity pruning and we got the alphas for the sub-trees. Afterwards, we build a tree with the different values of alphas obtained in the previous step\footnote{We actually build only a fifth because there was too much possible alphas.}. Finally, we computed the score of the LS and the TS on the different tress and plotted it. We obtained the following graphs:
+\paragraph{}We split the learning sample in 2 using proportions 75\% and 25\% where the 75\% will be our new learning set and the 25\% will be our new test set. Then, we computed the path during the minimal cost-complexity pruning and we got the alphas for the sub-trees. Afterwards, we build a tree with the different values of alphas obtained in the previous step\footnote{We actually build only a fifth because there was too much possible alphas.}. Finally, we computed the score of the LS and the TS on the different tress and plotted it. We obtained the following graphs\footnote{The graph on the right is a zoom on the graph on the left.}:
 \begin{table}[H]
 \centering
 \begin{tabular}{ll}
@@ -201,7 +204,7 @@ The analysis performed for this subsection is available in the Jupyter notebook 
 This model is implemented in the file \texttt{dt\_filtered.py}. This particular model provided an accuracy of 0.7928571428571429 using a 10-fold cross validation approach\footnote{Available in the Jupyter notebook \texttt{dt\_filtered.ipynb}.} and a score of 0.43428 on Kaggle. This is an improvement compared to the 0.40285 obtained with pruning.
 
 \subsubsection{Conclusion on decision trees}
-\textcolor{red}{TO BE ADDED}
+\paragraph{}After the study performed on decision trees, we concluded that decision trees were not adequate for this project due to the complexity of the dataset. We decided to move to more complex models.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -209,7 +212,7 @@ This model is implemented in the file \texttt{dt\_filtered.py}. This particular 
 \paragraph{}Next, we decided to use random forests because they should provide better accuracies than decision trees. Yet, their interpretability is still easy.
 
 \subsubsection{Random forest with 40 trees} \label{subsubsec:rf40Trees}
-\paragraph{}First, we decided to try a few forests and measuring their accuracies using a 10-fold cross validation approach. We obtained the following results:
+\paragraph{}First, we decided to try a few forests and measuring their accuracies using a 10-fold cross validation strategy. We obtained the following results:
 \begin{table}[H]
 \centering
 \begin{tabular}{|l|l|l|l|}
@@ -241,14 +244,14 @@ Based on figure \ref{fig:rf-acc-1}, we can see that, for a number of trees great
 As we can see on figure \ref{fig:rf-acc-2}, the smaller the value of \texttt{min\_sample\_split}, the higher the accuracy using a 10-fold cross validation measure.
 \paragraph{}Based on a what we have observed, we decided to try a random forest composed of 40 trees with \texttt{min\_sample\_split} set to 25.\\
 This model is implemented in the file \texttt{rf\_40\_25.py} and the analysis performed is available in the Jupyter notebook \texttt{random\_forest.ipynb}.\\
-This model provided an accuracy of 0.9288571428571428 using a 10-fold cross validation strategy and a score of 0.52 on Kaggle. This score on Kaggle is the same as the one obtained for 1-NN. Yet, this is an improvement compared to the scores obtained for the decisions tree in the part \ref{subsec:dt} of this report. This is what was expected because random forests use multiple trees.
+This model provided an accuracy of 0.9288571428571428 using a 10-fold cross validation strategy and a score of 0.52 on Kaggle. This score on Kaggle is the same as the one obtained for 1-NN. Yet, this is an improvement compared to the scores obtained for the decisions tree in the part \ref{subsec:dt} of this report. This is what was expected because random forests are ensemble methods that are using multiple trees.
 
 \subsubsection{Random forest with feature selection} \label{subsubsec:rfFiltered}
 \paragraph{}As explained in section \ref{sec:data-pre-process}, the data provided is not ideal. Thus, we decided to try a random forest with pre-processed data. We kept the same values for the number of trees and \texttt{min\_sample\_split}.\\
-This model is implemented in the file \texttt{rf\_filtered.py}. This particular model provides an accuracy of 0.9074285714285713 using a 10-fold cross validation approach\footnote{Available in the Jupyter notebook \texttt{random\_forest\_filtered.ipynb}.} and a score of 0.48285 on Kaggle. This is less than what we obtained for a random forest without filtering the data.
+This model is implemented in the file \texttt{rf\_filtered.py}. This particular model provides an accuracy of 0.9074285714285713 using a 10-fold cross validation approach\footnote{Available in the Jupyter notebook \texttt{random\_forest\_filtered.ipynb}.} and a score of 0.48285 on Kaggle. This is less than what we obtained for a random forest without filtering the data. This is certainly linked to the fact that our first approach for feature selection was not ideal as explained in section \ref{sec:data-pre-process}.
 
 \subsubsection{Random forest with feature extraction} \label{subsubsec:rf_feature_extraction}
-\paragraph{}We then used the feature extraction of the section \ref{sec:feature_ex} and obtained these results locally using the cross-validation and splitting according to the subject id's: 
+\paragraph{}The, we used the feature extraction of the section \ref{sec:feature_ex} and obtained these results locally using the cross-validation and splitting according to the subject ids: 
 
 \begin{figure}[H]
 \centering
@@ -257,28 +260,32 @@ This model is implemented in the file \texttt{rf\_filtered.py}. This particular 
 \label{fig:rf-feature-extraction}
 \end{figure}
 
-\paragraph{}The way the features were generated is well appropriate to trees: they can for example split according to the feature which represents the variance of the timesteps. The tree can divide the one having a null variance from the others which represents splitting static activities from dynamic ones.
+\paragraph{}The way the features were generated is well appropriate to trees. They can, for example, split according to the feature which represents the variance of the timesteps. The tree can divide the ones having a null variance from the others which represents splitting static activities from dynamic ones.
 
 \paragraph{}The implementation of this model is available in the \texttt{random\_forest\_feature\_extraction.py} Python script.
 
 \subsubsection{Conclusion on random forests}
-\paragraph{}Random forests which is an ensemble method using "bagged" trees fill the trend of the trees to overfit and is thus well adapted to our feature extraction. 
+\paragraph{}Random forests which is an ensemble method using "bagged" trees fill the trend of the trees to overfit and is thus well adapted to our feature extraction. As observable in the table of section \ref{sec:summary}, random forest is the model that provides the highest accuracy on Kaggle.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Logistic regression} \label{subsec:lr}
 
-\paragraph{}We tried to use the Logistic regression model on our extracted features. Indeed, Logistic regression being a linear classifier, it relies upon the quality of the features in order to perform good predictions.
-When trying this model, we observed a warning concerning the convergence saying that it was better to standardize the data. We thus did it but the Logistic Regression did not perform well predictions: it was really often predicting the running activity. 
-We thus conclude that our features were too complex for this model. 
+\paragraph{}We tried to use the logistic regression model on our extracted features. Indeed, logistic regression being a linear classifier, it relies upon the quality of the features in order to perform good predictions.
+When trying this model, we observed a warning concerning the convergence saying that it was better to standardize the data. Thus, we did it but the logistic regression did not result in good predictions. It was really often predicting the running activity. 
+Thus, we concluded that our features were too complex for this model. 
 
 \paragraph{}The implementation of this part can be found in the \texttt{logistic\_regression\_feature\_extraction.py} Python script.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \subsection{Multilayer perceptron} \label{subsec:mlp}
-\paragraph{}We tried to use single and multi layers perceptron classifier as model both with feature selection and feature extraction because the initial dataset was too huge to train this model. The main parameters of this model
-are the number of neurons and the number of layers. We thus studied the model according to these two parameters.
+\paragraph{}We tried to use single and multi layers perceptron classifiers as models, both with feature selection and feature extraction because the initial dataset was too huge to train this model. The main parameters of this model
+are the number of neurons and the number of layers. Thus, we studied the model according to these two parameters.
 
 \subsubsection{Feature selection}
 
-\paragraph{}The evolution of the model with feature selection according to the number of neurons and layers can be observed on the figures \ref{fig:mlp-feature-selection-neurons} and \ref{fig:mlp-feature-selection-layers}
+\paragraph{}The evolution of the model with feature selection according to the number of neurons and layers can be observed on the figures \ref{fig:mlp-feature-selection-neurons} and \ref{fig:mlp-feature-selection-layers}.
 
 \begin{figure}[H]
 \centering
@@ -298,7 +305,7 @@ are the number of neurons and the number of layers. We thus studied the model ac
 
 \subsubsection{Feature extraction} \label{subsubsec:mlp-feature-extraction}
 
-\paragraph{}The evolution of this model with feature extraction according to the number of neurons and layers can be observed on the figures \ref{fig:mlp-feature-extraction-neurons} and \ref{fig:mlp-feature-extraction-layers}
+\paragraph{}The evolution of this model with feature extraction according to the number of neurons and layers can be observed on the figures \ref{fig:mlp-feature-extraction-neurons} and \ref{fig:mlp-feature-extraction-layers}.
 
 \begin{figure}[H]
 \centering
@@ -318,7 +325,7 @@ are the number of neurons and the number of layers. We thus studied the model ac
 
 \subsubsection{Conclusion on Multilayer perceptron}
 
-\paragraph{}We did not investigate much on Multilayer perceptron classifier because we observed that this model was hard to tune. The graphics we presented in this section do not give real information about what the best parameters are.
+\paragraph{}We did not investigate much on multilayer perceptron classifier because we observed that this model was hard to tune. The graphics we presented in this section do not give real information about what the optimal parameters are.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -349,7 +356,7 @@ The peak observed on the graph is for a value of the regularization parameter of
 The study performed for this model is available in the Jupyter notebook \texttt{svc-feature-extract\\ion.ipynb} and the implementation of the model in the file \texttt{svc-reg-60.py}.
 
 \subsubsection{Support vector classification - $\nu$-SVC} \label{subsubsec:nusvc}
-\paragraph{}This approach is based on the model $\nu$-SVC of scikit-learn\footnote{sklearn.svm.NuSVC}. As always, we decided to study the accuracy of the model depending on the value of the parameter $\nu$. To study the accuracy, we split the learning set based on the ids of the 5 subjects and by calculating average accuracies over multiples splits. We used feature selection to reduce the size of the learning set.\\
+\paragraph{}This approach is based on the model $\nu$-SVC of scikit-learn\footnote{sklearn.svm.NuSVC.}. As always, we decided to study the accuracy of the model depending on the value of the parameter $\nu$. To study the accuracy, we split the learning set based on the ids of the 5 subjects and by calculating average accuracies over multiples splits. We used feature selection to reduce the size of the learning set.\\
 We study the accuracy of the model for values of $\nu$ in [0.1, 0.6]. We obtained the following graph:
 \begin{figure}[H]
 \centering
@@ -361,10 +368,12 @@ The code for the generation of the graph is available in the Jupyter notebook \t
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Summary table}
+\section{Summary table} \label{sec:summary}
 \paragraph{}The following table summaries the techniques we have tried and the scores we have obtained on Kaggle.
+
 \begin{table}[H]
 \centering
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{|l|l|l|}
 \hline
 \multicolumn{1}{|c|}{\textbf{Approach}}                     & \multicolumn{1}{c|}{\textbf{Report section}} & \multicolumn{1}{c|}{\textbf{Kaggle score}} \\ \hline
@@ -392,12 +401,13 @@ NuSVC with feature extraction                               & \ref{subsubsec:nus
 Random forest - 1000 trees with improved feature extraction & \ref{subsubsec:rf_feature_extraction}                                 & 0.91142                                    \\ \hline
 Random forest - 400 trees with improved feature extraction & \ref{subsubsec:rf_feature_extraction}                                 & 0.91714                                   \\ \hline
 \end{tabular}
+}
 \caption{Approaches with respective Kaggle scores}
 \end{table}
 
 \section{Conclusion}
 
-This project allowed us to apply a lot of the techniques and models studied in the theoretical course. It helps us to understand certain issues related to a classification problem.
+This project allowed us to apply a lot of the techniques and models studied in the theoretical course. It helped us to understand certain issues related to a classification problem.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}

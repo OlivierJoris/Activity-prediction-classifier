@@ -957,7 +957,7 @@ if __name__ == '__main__':
     gen_score = []
     number_trees = []
 
-    for x in range(100, 1000, 100):
+    for x in range(100, 1100, 100):
         for j in range(iter_nb):
             random.shuffle(ids)
 
@@ -996,9 +996,9 @@ if __name__ == '__main__':
         number_trees.append(x)
             
     plt.plot(number_trees, gen_score)
-    plt.xlabel("Number of forest")
+    plt.xlabel("Number of trees")
     plt.ylabel("Accuracy")
-    plt.title("Mean accuracies of random forest with feature extraction according to the number of forests.")
+    plt.title("Mean accuracies of random forest with feature extraction according to the number of trees.")
     plt.savefig('random_forest_feature_extraction.png')
     plt.show()
 
